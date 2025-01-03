@@ -1,0 +1,3 @@
+[workspace]
+members = ["mapkom_server"]
+resolver = "3"
