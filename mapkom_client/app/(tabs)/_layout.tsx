@@ -19,7 +19,7 @@ export default function TabLayout() {
           title: t('tabs.index'),
           tabBarIcon: ({ focused, ...props }) => (
             <MaterialCommunityIcons
-              name={focused ? 'home' : 'home-outline'}
+              name={focused ? 'map' : 'map-outline'}
               focused={focused}
               {...props}
             />

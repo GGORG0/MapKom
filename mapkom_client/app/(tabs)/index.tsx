@@ -1,17 +1,25 @@
 import { styles } from '@/lib/styles';
-import { Link } from 'expo-router';
-import { useTranslation } from 'react-i18next';
-import { Button, Surface, Text } from 'react-native-paper';
+import { Surface } from 'react-native-paper';
+import MapLibreGL from '@maplibre/maplibre-react-native';
+import { StyleSheet } from 'react-native';
+
+MapLibreGL.setAccessToken(null);
 
 export default function Index() {
-  const { t } = useTranslation();
-
   return (
     <Surface style={styles.screen}>
-      <Text>{t('indexPage.title')}</Text>
-      <Link href="/about" asChild>
-        <Button mode="contained">{t('aboutPage.title')}</Button>
-      </Link>
+      {/* @ts-ignore */}
+      <MapLibreGL.MapView
+        style={localStyles.map}
+        styleURL="https://demotiles.maplibre.org/style.json"
+      />
     </Surface>
   );
 }
+
+const localStyles = StyleSheet.create({
+  map: {
+    flex: 1,
+    alignSelf: 'stretch',
+  },
+});
