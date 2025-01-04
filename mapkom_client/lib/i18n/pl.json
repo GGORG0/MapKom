@@ -1,0 +1,16 @@
+{
+  "aboutPage": {
+    "title": "Strona informacyjna"
+  },
+  "indexPage": {
+    "title": "Strona indeksu"
+  },
+  "notFoundPage": {
+    "goHome": "Wróć na stronę główną",
+    "title": "Nie znaleziono"
+  },
+  "tabs": {
+    "about": "Info",
+    "index": "Główna"
+  }
+}

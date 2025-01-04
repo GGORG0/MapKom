@@ -1,21 +1,23 @@
 {
   "expo": {
     "name": "MapKom",
-    "slug": "MapKom",
+    "slug": "mapkom",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "mapkom",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "xyz.ggorg.mapkom"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "xyz.ggorg.mapkom"
     },
     "web": {
       "bundler": "metro",
@@ -29,8 +31,17 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-font",
+      [
+        "react-native-localization-settings",
+        {
+          "languages": [
+            "en",
+            "pl"
+          ]
         }
       ]
     ],

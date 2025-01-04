@@ -1,0 +1,16 @@
+{
+  "aboutPage": {
+    "title": "About page"
+  },
+  "indexPage": {
+    "title": "Index page"
+  },
+  "notFoundPage": {
+    "goHome": "Go back home",
+    "title": "Not found"
+  },
+  "tabs": {
+    "about": "About",
+    "index": "Home"
+  }
+}
