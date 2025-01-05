@@ -1,7 +1,7 @@
 import { styles } from '@/lib/styles';
 import { Surface } from 'react-native-paper';
 import MapLibreGL from '@maplibre/maplibre-react-native';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { Platform, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMemo } from 'react';
 import lightStyle from '@/lib/mapStyles/light.json';
@@ -16,21 +16,6 @@ MapLibreGL.setAccessToken(null);
 
 export default function Index() {
   const insets = useSafeAreaInsets();
-
-  // const localStyles = useMemo(
-  //   () =>
-  //     StyleSheet.create({
-  //       map: {
-  //         flex: 1,
-  //         alignSelf: 'stretch',
-  //         paddingTop: insets.top,
-  //         paddingRight: insets.right,
-  //         paddingBottom: insets.bottom,
-  //         paddingLeft: insets.left,
-  //       },
-  //     }),
-  //   [insets],
-  // );
 
   const colorScheme = useColorScheme();
 
@@ -49,7 +34,10 @@ export default function Index() {
         localizeLabels={false}
         pitchEnabled={false}
         logoEnabled={true}
-        compassViewMargins={{ y: insets.top + 8, x: insets.right + 8 }}
+        compassViewMargins={{
+          y: Platform.OS === 'ios' ? 0 : Math.max(insets.top, 8),
+          x: insets.right + 8,
+        }}
       />
     </Surface>
   );
