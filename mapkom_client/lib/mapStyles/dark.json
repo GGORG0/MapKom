@@ -2835,9 +2835,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "hsl(132, 0%, 0%)",
-        "text-halo-color": "hsla(254, 0%, 0%, 0.7)",
-        "text-halo-width": 1
+        "text-color": "hsl(132, 0%, 0%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "$type", "LineString"]]
@@ -2857,9 +2855,7 @@
         "text-max-width": 5
       },
       "paint": {
-        "text-color": "hsl(104, 0%, 0%)",
-        "text-halo-color": "hsla(254, 0%, 0%, 0)",
-        "text-halo-width": 1
+        "text-color": "hsl(104, 0%, 0%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "$type", "Point"], ["!=", "class", "ocean"]]
@@ -2878,9 +2874,7 @@
         "text-max-width": 5
       },
       "paint": {
-        "text-color": "hsl(104, 0%, 0%)",
-        "text-halo-color": "hsla(254, 0%, 0%, 0)",
-        "text-halo-width": 1
+        "text-color": "hsl(104, 0%, 0%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "$type", "Point"], ["==", "class", "ocean"]]
@@ -2903,10 +2897,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "#666"
       },
       "metadata": {},
       "filter": [
@@ -2951,10 +2942,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "#666"
       },
       "metadata": {},
       "filter": [
@@ -2999,10 +2987,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "#666"
       },
       "metadata": {},
       "filter": [
@@ -3032,10 +3017,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "#666"
       },
       "metadata": {},
       "filter": [
@@ -3064,10 +3046,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "rgba(102, 102, 102, 1)",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "rgba(102, 102, 102, 1)"
       },
       "metadata": {},
       "filter": [
@@ -3174,10 +3153,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "rgba(113, 103, 95, 1)",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "rgba(255, 255, 255, 1)",
-        "text-halo-width": 1
+        "text-color": "rgba(113, 103, 95, 1)"
       },
       "metadata": {},
       "filter": ["all", ["in", "subclass", "gondola", "cable_car"]]
@@ -3204,9 +3180,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "rgba(46, 126, 168, 1)",
-        "text-halo-blur": 0.5,
-        "text-halo-width": 1
+        "text-color": "rgba(46, 126, 168, 1)"
       },
       "filter": ["all", ["==", "subclass", "ferry"]]
     },
@@ -3231,9 +3205,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "hsl(128, 17%, 100%)",
-        "text-halo-blur": 0.5,
-        "text-halo-width": 1
+        "text-color": "hsl(128, 17%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["!in", "subclass", "ferry", "gondola", "cable_car"]]
@@ -3401,10 +3373,7 @@
         "text-max-width": 9
       },
       "paint": {
-        "text-color": "#666",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-color": "#666"
       },
       "filter": ["all", ["has", "iata"]]
     },
@@ -3426,9 +3395,7 @@
         "visibility": "visible"
       },
       "paint": {
-        "text-color": "rgba(135, 135, 135, 1)",
-        "text-halo-color": "rgba(255, 255, 255, 1)",
-        "text-halo-width": 1.5
+        "text-color": "rgba(135, 135, 135, 1)"
       },
       "filter": ["all", ["==", "class", "gate"]]
     },
@@ -3456,10 +3423,7 @@
         "text-letter-spacing": 0.1
       },
       "paint": {
-        "text-color": "rgba(94, 141, 58, 1)",
-        "text-halo-blur": 0.5,
-        "text-halo-color": "rgba(255,255,255,0.8)",
-        "text-halo-width": 1.2
+        "text-color": "rgba(94, 141, 58, 1)"
       },
       "metadata": {},
       "filter": ["all", ["==", "rank", 1]]
@@ -3486,9 +3450,7 @@
         "text-letter-spacing": 0.1
       },
       "paint": {
-        "text-color": "hsl(98, 3%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 1.2
+        "text-color": "hsl(98, 3%, 100%)"
       },
       "metadata": {},
       "filter": [
@@ -3516,9 +3478,7 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(98, 0%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 1.2
+        "text-color": "hsl(98, 0%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "village"]]
@@ -3552,9 +3512,7 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(98, 0%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 1.2
+        "text-color": "hsl(98, 0%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "town"]]
@@ -3590,9 +3548,7 @@
         "icon-allow-overlap": true
       },
       "paint": {
-        "text-color": "hsl(98, 0%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 1.2
+        "text-color": "hsl(98, 0%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "city"]]
@@ -3620,9 +3576,7 @@
         "text-letter-spacing": 0.1
       },
       "paint": {
-        "text-color": "rgba(118, 116, 108, 1)",
-        "text-halo-color": "rgba(255,255,255,0.7)",
-        "text-halo-width": 0.8
+        "text-color": "rgba(118, 116, 108, 1)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "state"], ["in", "rank", 3, 4, 5]]
@@ -3650,9 +3604,7 @@
         "text-letter-spacing": 0.1
       },
       "paint": {
-        "text-color": "hsl(146, 4%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.7)",
-        "text-halo-width": 0.8
+        "text-color": "hsl(146, 4%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "state"], ["in", "rank", 1, 2]]
@@ -3676,10 +3628,7 @@
         "text-transform": "none"
       },
       "paint": {
-        "text-color": "hsl(338, 14%, 100%)",
-        "text-halo-blur": 1,
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 0.8
+        "text-color": "hsl(338, 14%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "country"], ["!has", "iso_a2"]]
@@ -3703,10 +3652,7 @@
         "text-transform": "none"
       },
       "paint": {
-        "text-color": "hsl(338, 14%, 100%)",
-        "text-halo-blur": 1,
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 0.8
+        "text-color": "hsl(338, 14%, 100%)"
       },
       "metadata": {},
       "filter": [
@@ -3735,10 +3681,7 @@
         "text-transform": "none"
       },
       "paint": {
-        "text-color": "hsl(338, 14%, 100%)",
-        "text-halo-blur": 1,
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 0.8
+        "text-color": "hsl(338, 14%, 100%)"
       },
       "metadata": {},
       "filter": [
@@ -3768,10 +3711,7 @@
         "text-transform": "none"
       },
       "paint": {
-        "text-color": "hsl(338, 14%, 100%)",
-        "text-halo-blur": 1,
-        "text-halo-color": "hsla(98, 0%, 100%, 0.8)",
-        "text-halo-width": 0.8
+        "text-color": "hsl(338, 14%, 100%)"
       },
       "metadata": {},
       "filter": [
@@ -3796,9 +3736,7 @@
         "text-transform": "uppercase"
       },
       "paint": {
-        "text-color": "hsl(98, 33%, 100%)",
-        "text-halo-color": "hsla(98, 0%, 100%, 0.7)",
-        "text-halo-width": 1
+        "text-color": "hsl(98, 33%, 100%)"
       },
       "metadata": {},
       "filter": ["all", ["==", "class", "continent"]]
