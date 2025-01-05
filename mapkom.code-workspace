@@ -23,5 +23,8 @@
 		"i18n-ally.tabStyle": "space",
 		"i18n-ally.indent": 2,
 		"i18n-ally.keystyle": "nested",
+		"i18n-ally.localesPaths": [
+			"lib/i18n"
+		],
 	}
 }
