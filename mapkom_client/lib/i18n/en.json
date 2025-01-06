@@ -2,8 +2,14 @@
   "aboutPage": {
     "title": "About page"
   },
+  "errorPage": {
+  },
+  "errorSheet": {
+    "dismiss": "Dismiss",
+    "title": "Error!",
+    "triggeredBy": "Triggered by:"
+  },
   "indexPage": {
-    "title": "Map"
   },
   "notFoundPage": {
     "goHome": "Go back home",

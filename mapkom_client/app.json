@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "mapkom",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "xyz.ggorg.mapkom"
@@ -49,6 +49,14 @@
         "expo-location",
         {
           "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Material3"
+          }
         }
       ]
     ],

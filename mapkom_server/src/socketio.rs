@@ -3,6 +3,7 @@ pub mod update_viewport;
 
 use crate::{cities::CityMap, geometry::area::Area};
 use color_eyre::{Result, eyre::eyre};
+use serde::Deserialize;
 use socketioxide::{
     SocketIo, SocketIoBuilder,
     extract::{Data, SocketRef, State},
@@ -22,26 +23,34 @@ pub struct SocketState {
 
 pub type SocketStateWrapped = Arc<RwLock<SocketState>>;
 
+#[derive(Deserialize)]
+struct ConnectionAuth {
+    city: String,
+}
+
 fn connection_middleware(
     s: SocketRef,
-    Data(auth): Data<String>,
+    Data(auth): Data<ConnectionAuth>,
     State(city_map): State<CityMap>,
 ) -> Result<()> {
     let sid = s.id;
-    if city_map.contains_key(&auth) {
+    if city_map.contains_key(&auth.city) {
         let state = SocketState {
-            city: auth.clone(),
+            city: auth.city.clone(),
             viewport: ((0.0, 0.0), (0.0, 0.0)).into(),
         };
         s.extensions.insert(Arc::new(RwLock::new(state)));
 
-        s.join(auth.clone())?;
+        s.join(auth.city.clone())?;
 
-        debug!("Socket {} connected with auth: {}", &sid, &auth);
+        debug!("Socket {} connected with auth: {}", &sid, &auth.city);
 
         Ok(())
     } else {
-        warn!("Socket {} connected with invalid auth: {}", &sid, auth);
+        warn!(
+            "Socket {} connected with invalid auth: {}",
+            &sid, &auth.city
+        );
         s.disconnect()?;
         Err(eyre!("Invalid auth"))
     }

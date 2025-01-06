@@ -2,8 +2,14 @@
   "aboutPage": {
     "title": "Strona informacyjna"
   },
+  "errorPage": {
+  },
+  "errorSheet": {
+    "dismiss": "Zamknij",
+    "title": "Błąd!",
+    "triggeredBy": "Wywołany przez:"
+  },
   "indexPage": {
-    "title": "Mapa"
   },
   "notFoundPage": {
     "goHome": "Wróć na stronę główną",

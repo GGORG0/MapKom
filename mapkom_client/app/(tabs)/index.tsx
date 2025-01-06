@@ -3,11 +3,12 @@ import { FAB, Surface } from 'react-native-paper';
 import MapLibreGL from '@maplibre/maplibre-react-native';
 import { Platform, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import lightStyle from '@/lib/mapStyles/light.json';
 import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
+import React from 'react';
 
 const mapStyles = {
   light: lightStyle,
@@ -32,11 +33,18 @@ export default function Index() {
   const mapStyleString = useMemo(() => JSON.stringify(mapStyle), [mapStyle]);
 
   // LOCATION //
-  const [status, requestPermission] = useForegroundPermissions();
+  const [locationPermissionStatus, requestPermission] =
+    useForegroundPermissions();
   // TODO: handle approximate location
 
-  const [, setLocation] = useState<MapLibreGL.Location>();
+  // const [, setLocation] = useState<MapLibreGL.Location>();
   const [followUserLocation, setFollowUserLocation] = useState(false);
+
+  const [followZoom, setFollowZoom] = useState(false);
+  useEffect(() => {
+    // TODO: fix bug where you have to press the button twice at first
+    if (followUserLocation) setFollowZoom(true);
+  }, [followUserLocation]);
 
   return (
     <Surface style={styles.screen}>
@@ -51,29 +59,41 @@ export default function Index() {
           x: insets.right + 8,
         }}>
         <MapLibreGL.Camera
-          followUserLocation={status?.granted && followUserLocation}
-          followZoomLevel={16}
+          animationMode="flyTo"
+          followUserLocation={
+            locationPermissionStatus?.granted && followUserLocation
+          }
+          followZoomLevel={followZoom ? 16 : 12}
           onUserTrackingModeChange={(event) => {
+            console.log(event.nativeEvent.payload);
             setFollowUserLocation(event.nativeEvent.payload.followUserLocation);
           }}
         />
-        {status?.granted && (
-          <MapLibreGL.UserLocation
-            animated
-            showsUserHeadingIndicator
-            androidRenderMode="compass"
-            renderMode="native"
-            onUpdate={setLocation}
-          />
+        {locationPermissionStatus?.granted && (
+          <>
+            <MapLibreGL.UserLocation
+              animated
+              showsUserHeadingIndicator
+              androidRenderMode="compass"
+              renderMode="native"
+              // onUpdate={setLocation}
+            />
+          </>
         )}
       </MapLibreGL.MapView>
 
       <MapFabStack>
         <FAB
           animated={false}
-          icon={followUserLocation ? 'crosshairs-gps' : 'crosshairs'}
+          icon={
+            locationPermissionStatus?.granted
+              ? followUserLocation
+                ? 'crosshairs-gps'
+                : 'crosshairs'
+              : 'crosshairs-off'
+          }
           onPress={() => {
-            if (!status?.granted) requestPermission();
+            if (!locationPermissionStatus?.granted) requestPermission();
             setFollowUserLocation((prev) => !prev);
           }}
         />

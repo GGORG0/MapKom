@@ -1,4 +1,4 @@
-import { Link, Stack, usePathname } from 'expo-router';
+import { Link, usePathname } from 'expo-router';
 import React from 'react';
 import { Button, Surface, Text } from 'react-native-paper';
 import { styles } from '@/lib/styles';
@@ -11,8 +11,6 @@ export default function NotFoundScreen() {
 
   return (
     <Surface style={styles.screen}>
-      <Stack.Screen options={{ title: t('notFoundPage.title') }} />
-
       <Text variant="displayLarge">{t('notFoundPage.title')}</Text>
 
       <Text style={localStyles.pathDisplay}>{path}</Text>

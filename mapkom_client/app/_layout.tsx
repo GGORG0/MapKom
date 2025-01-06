@@ -20,7 +20,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import resources from '@/lib/i18n';
 import { createLanguageDetector } from 'react-native-localization-settings';
-import { StatusBar } from 'expo-status-bar';
+import { SocketIoProvider } from '@/lib/providers/SocketIoProvider';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SheetProvider } from 'react-native-actions-sheet';
+import '@/lib/sheets';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 const languageDetector = createLanguageDetector({});
 
@@ -77,19 +82,28 @@ function RootLayout() {
   });
 
   return (
-    <ThemeProvider
-      value={
-        colorScheme === 'light'
-          ? { ...LightTheme, fonts: NavLightTheme.fonts }
-          : { ...DarkTheme, fonts: NavDarkTheme.fonts }
-      }>
-      <PaperProvider theme={paperTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </PaperProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider
+        value={
+          colorScheme === 'light'
+            ? { ...LightTheme, fonts: NavLightTheme.fonts }
+            : { ...DarkTheme, fonts: NavDarkTheme.fonts }
+        }>
+        <PaperProvider theme={paperTheme}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <SheetProvider>
+              {/* TODO: handle more than 1 city */}
+              <SocketIoProvider city="wroclaw">
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+                <SystemBars style="auto" />
+              </SocketIoProvider>
+            </SheetProvider>
+          </GestureHandlerRootView>
+        </PaperProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

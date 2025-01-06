@@ -43,7 +43,7 @@ pub async fn main(city_map: CityMap) -> Result<(Serve<Router, Router>, SocketIo)
     );
 
     let listener = TcpListener::bind(
-        std::env::var("MAPKOM_SERVER_ADDRESS").unwrap_or_else(|_| "localhost:8080".to_string()),
+        std::env::var("MAPKOM_SERVER_ADDRESS").unwrap_or_else(|_| "0.0.0.0:8080".to_string()),
     )
     .await?;
 
