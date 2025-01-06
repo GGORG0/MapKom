@@ -22,6 +22,8 @@ export default function MDActionSheet({
   return (
     <ActionSheet
       containerStyle={{
+        borderTopLeftRadius: 5 * theme.roundness,
+        borderTopRightRadius: 5 * theme.roundness,
         justifyContent: 'center',
         backgroundColor: theme.colors.elevation.level1,
         ...containerStyle,
