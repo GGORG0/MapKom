@@ -3013,16 +3013,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@uidotdev/usehooks@npm:^2.4.1":
-  version: 2.4.1
-  resolution: "@uidotdev/usehooks@npm:2.4.1"
-  peerDependencies:
-    react: ">=18.0.0"
-    react-dom: ">=18.0.0"
-  checksum: 10c0/181c43fb324dbe4fef9762c61ab4b8235efa48abedf39a9bfeab65872522c43dae789c4f85b82a1164ed7bb18ae7ff25c3a19e7c4e0eb944937ac7f8109cee9b
-  languageName: node
-  linkType: hard
-
 "@ungap/structured-clone@npm:^1.2.0":
   version: 1.2.1
   resolution: "@ungap/structured-clone@npm:1.2.1"
@@ -8353,7 +8343,6 @@ __metadata:
     "@types/jest": "npm:^29.5.12"
     "@types/react": "npm:~18.3.12"
     "@types/react-test-renderer": "npm:^18.3.0"
-    "@uidotdev/usehooks": "npm:^2.4.1"
     eslint: "npm:^8.57.0"
     eslint-config-expo: "npm:~8.0.1"
     eslint-config-prettier: "npm:^9.1.0"
