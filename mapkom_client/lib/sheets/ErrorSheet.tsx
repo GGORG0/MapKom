@@ -1,32 +1,53 @@
 import { Button, Icon, MD3Colors, Text } from 'react-native-paper';
 import MDActionSheet from './MDActionSheet';
 import {
+  ActionSheetRef,
   SheetDefinition,
   SheetProps,
   useSheetRef,
 } from 'react-native-actions-sheet';
-import { StyleSheet, View } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useEffect } from 'react';
+import MaterialCommunityIcon from '../Icon';
 
 export default function ErrorSheet(props: SheetProps<'error-sheet'>) {
   const { t } = useTranslation();
   const ref = useSheetRef();
 
+  useEffect(() => {
+    if (props.payload?.registerAutoClose) {
+      return props.payload.registerAutoClose(ref);
+    }
+  }, [props.payload, ref]);
+
   return (
     <MDActionSheet
       id={props.sheetId}
       containerStyle={{
-        minHeight: 200,
-        gap: 16,
+        minHeight: '75%',
+      }}
+      style={{
+        gap: 8,
       }}
       disableDragBeyondMinimumSnapPoint
       closable={!props.payload?.fatal}
       gestureEnabled={!props.payload?.fatal}>
-      <View style={localStyles.headerContainer}>
-        <Icon source="alert" size={48} color={MD3Colors.error100} />
-        <Text variant="displayLarge">{t('errorSheet.title')}</Text>
-      </View>
+      <Icon
+        source={props.payload?.icon || 'alert'}
+        size={48}
+        color={MD3Colors.error100}
+      />
+
+      <Text variant="displaySmall" style={localStyles.text}>
+        {props.payload?.title || t('errorSheet.title')}
+      </Text>
+
+      {props.payload?.children && (
+        <View style={props.payload?.childrenViewStyle}>
+          {props.payload?.children}
+        </View>
+      )}
 
       <Text style={localStyles.textMonospace}>
         {props.payload?.error instanceof Error
@@ -39,10 +60,10 @@ export default function ErrorSheet(props: SheetProps<'error-sheet'>) {
       )}
 
       {props.payload?.trigger && (
-        <>
-          <Text style={localStyles.text}>{t('errorSheet.triggeredBy')}</Text>
+        <Text style={localStyles.text}>
+          {t('errorSheet.triggeredBy')}{' '}
           <Text style={localStyles.textMonospace}>{props.payload.trigger}</Text>
-        </>
+        </Text>
       )}
 
       {!props.payload?.fatal && (
@@ -56,20 +77,26 @@ export default function ErrorSheet(props: SheetProps<'error-sheet'>) {
 
 export type definition = SheetDefinition<{
   payload: {
+    icon?: MaterialCommunityIcon;
+    title?: string;
+
+    children?: React.ReactNode;
+    childrenViewStyle?: StyleProp<ViewStyle>;
+
     error?: Error | string;
     details?: string;
+
     trigger?: string;
+
     fatal?: boolean;
+
+    registerAutoClose?: (
+      ref: React.MutableRefObject<ActionSheetRef<never>>,
+    ) => (() => void) | void;
   };
 }>;
 
 const localStyles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    color: MD3Colors.error100,
-  },
   text: {
     textAlign: 'center',
   },

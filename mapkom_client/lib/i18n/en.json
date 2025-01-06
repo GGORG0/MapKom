@@ -15,6 +15,12 @@
     "goHome": "Go back home",
     "title": "Not found"
   },
+  "socketIo": {
+    "errorSheet": {
+      "title": "Connection error!",
+      "tryingToReconnect": "Trying to reconnect..."
+    }
+  },
   "tabs": {
     "about": "About",
     "index": "Home"

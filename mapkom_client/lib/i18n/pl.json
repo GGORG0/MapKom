@@ -15,6 +15,12 @@
     "goHome": "Wróć na stronę główną",
     "title": "Nie znaleziono"
   },
+  "socketIo": {
+    "errorSheet": {
+      "title": "Błąd połączenia!",
+      "tryingToReconnect": "Próbuję ponownie połączyć..."
+    }
+  },
   "tabs": {
     "about": "Info",
     "index": "Główna"

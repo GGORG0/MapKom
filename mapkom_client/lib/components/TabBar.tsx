@@ -44,7 +44,7 @@ export default function TabBar(props: BottomTabBarProps) {
       }
       getLabelText={({ route }) => {
         const { options } = props.descriptors[route.key];
-        const label = options.tabBarLabel ?? options.title ?? route.name;
+        const label = options.tabBarLabel || options.title || route.name;
         return typeof label === 'string' ? label : undefined;
       }}
     />

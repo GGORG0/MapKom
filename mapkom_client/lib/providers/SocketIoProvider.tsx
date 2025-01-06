@@ -1,6 +1,9 @@
 import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
+import React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { SheetManager } from 'react-native-actions-sheet';
+import { useTranslation } from 'react-i18next';
+import { ActionSheetRef, SheetManager } from 'react-native-actions-sheet';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import { io, Socket } from 'socket.io-client';
 import { DisconnectDescription } from 'socket.io-client/build/esm/socket';
 
@@ -22,6 +25,8 @@ interface SocketIoProviderProps {
 }
 
 export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
+  const { t } = useTranslation();
+
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const [connected, setConnected] = useState(false);
@@ -50,12 +55,43 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
       return;
     }
 
+    const sheetAutoCloseHandler = (
+      ref: React.MutableRefObject<ActionSheetRef<never>>,
+    ) => {
+      const connectHandler = () => {
+        ref.current?.hide();
+      };
+      socket.on('connect', connectHandler);
+
+      return () => {
+        socket.off('connect', connectHandler);
+      };
+    };
+
+    const showSheet = (error: Error) => {
+      SheetManager.show('error-sheet', {
+        payload: {
+          icon: 'wifi-off',
+          title: t('socketIo.errorSheet.title'),
+          children: <ErrorSheetSpinner />,
+          childrenViewStyle: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+          },
+          error,
+          trigger: 'socketIo',
+          fatal: true,
+          registerAutoClose: sheetAutoCloseHandler,
+        },
+      });
+    };
+
     const connectHandler = () => {
       setConnected(true);
       setError(null);
 
-      // TODO: handle cases where the error sheet was shown by a different trigger
-      SheetManager.hide('error-sheet');
+      console.log('socketio connected');
     };
     socket.on('connect', connectHandler);
 
@@ -63,15 +99,9 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
       setConnected(false);
       setError(error);
 
-      console.error('connect_error', error);
+      console.error('socketio connect_error', error);
 
-      SheetManager.show('error-sheet', {
-        payload: {
-          error,
-          trigger: 'socketIo',
-          fatal: true,
-        },
-      });
+      showSheet(error);
     };
     socket.on('connect_error', connectErrorHandler);
 
@@ -82,15 +112,9 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
       setConnected(false);
       setError(new Error(reason));
 
-      console.log('disconnect', reason, description);
+      console.log('socketio disconnected', reason, description);
 
-      SheetManager.show('error-sheet', {
-        payload: {
-          error: new Error(reason),
-          trigger: 'socketIo',
-          fatal: true,
-        },
-      });
+      showSheet(new Error(reason));
     };
     socket.on('disconnect', disconnectHandler);
 
@@ -99,7 +123,7 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
       socket.off('connect_error', connectErrorHandler);
       socket.off('disconnect', disconnectHandler);
     };
-  }, [errorTrigger, pathError, pathname, router, socket]);
+  }, [errorTrigger, pathError, pathname, router, socket, t]);
 
   const contextValue = { socket, connected, error };
 
@@ -112,4 +136,15 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
 
 export function useSocketIo() {
   return useContext(SocketIoContext);
+}
+
+function ErrorSheetSpinner() {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <ActivityIndicator />
+      <Text>{t('socketIo.errorSheet.tryingToReconnect')}</Text>
+    </>
+  );
 }
