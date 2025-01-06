@@ -9,6 +9,9 @@ import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
+import { Area } from '@/lib/geometry';
+import { useThrottle } from '@uidotdev/usehooks';
+import { useSocketIo } from '@/lib/providers/SocketIoProvider';
 
 const mapStyles = {
   light: lightStyle,
@@ -37,7 +40,6 @@ export default function Index() {
     useForegroundPermissions();
   // TODO: handle approximate location
 
-  // const [, setLocation] = useState<MapLibreGL.Location>();
   const [followUserLocation, setFollowUserLocation] = useState(false);
 
   const [followZoom, setFollowZoom] = useState(false);
@@ -46,8 +48,27 @@ export default function Index() {
     if (followUserLocation) setFollowZoom(true);
   }, [followUserLocation]);
 
+  // MAP VIEWPORT //
+  const socket = useSocketIo();
+
+  const [viewport, setViewport] = useState<Area>({
+    north_west: { lat: 0, lng: 0 },
+    south_east: { lat: 0, lng: 0 },
+  });
+
+  const throttledViewport = useThrottle(viewport, 500);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit('update_viewport', throttledViewport);
+    }
+  }, [throttledViewport, socket]);
+
   return (
     <Surface style={styles.screen}>
+      {/* <Surface elevation={1} style={localStyles.debugView}>
+      </Surface> */}
+
       <MapLibreGL.MapView
         style={localStyles.map}
         styleJSON={mapStyleString}
@@ -57,6 +78,19 @@ export default function Index() {
         compassViewMargins={{
           y: Platform.OS === 'ios' ? 0 : Math.max(insets.top, 8),
           x: insets.right + 8,
+        }}
+        onRegionIsChanging={(feature) => {
+          const bounds = feature.properties.visibleBounds;
+          setViewport({
+            north_west: {
+              lat: bounds[0][1],
+              lng: bounds[1][0],
+            },
+            south_east: {
+              lat: bounds[1][1],
+              lng: bounds[0][0],
+            },
+          });
         }}>
         <MapLibreGL.Camera
           animationMode="flyTo"
@@ -76,10 +110,18 @@ export default function Index() {
               showsUserHeadingIndicator
               androidRenderMode="compass"
               renderMode="native"
-              // onUpdate={setLocation}
             />
           </>
         )}
+
+        <MapLibreGL.VectorSource
+          id="population"
+          url="mapbox://examples.8fgz4egr">
+          <MapLibreGL.CircleLayer
+            id="sf2010CircleFill"
+            sourceLayerID="sf2010"
+          />
+        </MapLibreGL.VectorSource>
       </MapLibreGL.MapView>
 
       <MapFabStack>
@@ -107,4 +149,17 @@ const localStyles = StyleSheet.create({
     flex: 1,
     alignSelf: 'stretch',
   },
+  // debugView: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   textAlign: 'center',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   margin: 8,
+  //   marginTop: 50,
+  //   padding: 8,
+  //   zIndex: 100,
+  // },
 });

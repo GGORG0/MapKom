@@ -7,17 +7,7 @@ import { ActivityIndicator, Text } from 'react-native-paper';
 import { io, Socket } from 'socket.io-client';
 import { DisconnectDescription } from 'socket.io-client/build/esm/socket';
 
-interface SocketIoContextType {
-  socket: Socket | null;
-  connected: boolean;
-  error: Error | null;
-}
-
-export const SocketIoContext = createContext<SocketIoContextType>({
-  socket: null,
-  connected: false,
-  error: null,
-});
+export const SocketIoContext = createContext<Socket | null>(null);
 
 interface SocketIoProviderProps {
   children: React.ReactNode;
@@ -28,9 +18,6 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
   const { t } = useTranslation();
 
   const [socket, setSocket] = useState<Socket | null>(null);
-
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -88,17 +75,11 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
     };
 
     const connectHandler = () => {
-      setConnected(true);
-      setError(null);
-
       console.log('socketio connected');
     };
     socket.on('connect', connectHandler);
 
     const connectErrorHandler = (error: Error) => {
-      setConnected(false);
-      setError(error);
-
       console.error('socketio connect_error', error);
 
       showSheet(error);
@@ -109,9 +90,6 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
       reason: Socket.DisconnectReason,
       description?: DisconnectDescription,
     ) => {
-      setConnected(false);
-      setError(new Error(reason));
-
       console.log('socketio disconnected', reason, description);
 
       showSheet(new Error(reason));
@@ -125,10 +103,8 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
     };
   }, [errorTrigger, pathError, pathname, router, socket, t]);
 
-  const contextValue = { socket, connected, error };
-
   return (
-    <SocketIoContext.Provider value={contextValue}>
+    <SocketIoContext.Provider value={socket}>
       {children}
     </SocketIoContext.Provider>
   );
@@ -136,6 +112,25 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
 
 export function useSocketIo() {
   return useContext(SocketIoContext);
+}
+
+export function useSocketIoListener(
+  event: string,
+  listener: (...args: any[]) => void,
+) {
+  const socket = useSocketIo();
+
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
+    socket.on(event, listener);
+
+    return () => {
+      socket.off(event, listener);
+    };
+  }, [event, listener, socket]);
 }
 
 function ErrorSheetSpinner() {

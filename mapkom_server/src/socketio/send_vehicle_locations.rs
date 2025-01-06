@@ -23,7 +23,7 @@ pub async fn send_vehicle_locations(
 
     let vehicles = vehicles
         .iter()
-        .filter(|vehicle| vehicle.position.in_area(&state.viewport))
+        .filter(|vehicle| vehicle.position.in_area_with_margin(&state.viewport, 0.15))
         .collect::<Vec<_>>();
 
     s.emit("vehicle_locations", &(last_updated, vehicles))

@@ -20,6 +20,10 @@ pub mod point {
         pub fn in_area(&self, area: &Area) -> bool {
             area.contains(self)
         }
+
+        pub fn in_area_with_margin(&self, area: &Area, margin_percent: f64) -> bool {
+            area.contains_with_margin(self, margin_percent)
+        }
     }
 
     impl From<(f64, f64)> for Point {
@@ -56,6 +60,22 @@ pub mod area {
         pub fn contains(&self, point: &Point) -> bool {
             (self.south_east.lat..=self.north_west.lat).contains(&point.lat)
                 && (self.north_west.lng..=self.south_east.lng).contains(&point.lng)
+        }
+
+        pub fn contains_with_margin(&self, point: &Point, margin_percent: f64) -> bool {
+            let margin_lat = (self.north_west.lat - self.south_east.lat).abs() * margin_percent;
+            let margin_lng = (self.south_east.lng - self.north_west.lng).abs() * margin_percent;
+
+            let north_west = Point::new(
+                self.north_west.lat + margin_lat,
+                self.north_west.lng - margin_lng,
+            );
+            let south_east = Point::new(
+                self.south_east.lat - margin_lat,
+                self.south_east.lng + margin_lng,
+            );
+
+            Area::new(north_west, south_east).contains(point)
         }
     }
 
