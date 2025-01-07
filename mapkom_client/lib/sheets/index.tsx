@@ -1,16 +1,21 @@
 import { registerSheet } from 'react-native-actions-sheet';
-import ExampleSheet, {
-    definition as ExampleSheetDefinition,
-} from './ExampleSheet';
 import ErrorSheet, { definition as ErrorSheetDefinition } from './ErrorSheet';
+import TextInputSheet, {
+    definition as TextInputSheetDefinition,
+} from './TextInputSheet';
+import ConfirmationSheet, {
+    definition as ConfirmationSheetDefinition,
+} from './ConfirmationSheet';
 
-registerSheet('example-sheet', ExampleSheet);
 registerSheet('error-sheet', ErrorSheet);
+registerSheet('text-input-sheet', TextInputSheet);
+registerSheet('confirmation-sheet', ConfirmationSheet);
 
 declare module 'react-native-actions-sheet' {
     interface Sheets {
-        'example-sheet': ExampleSheetDefinition;
         'error-sheet': ErrorSheetDefinition;
+        'text-input-sheet': TextInputSheetDefinition;
+        'confirmation-sheet': ConfirmationSheetDefinition;
     }
 }
 

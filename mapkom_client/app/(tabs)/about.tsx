@@ -11,10 +11,48 @@ export default function AboutScreen() {
             <Text>{t('aboutPage.title')}</Text>
             <Button
                 mode="contained"
-                onPress={() => {
-                    SheetManager.show('example-sheet');
+                onPress={async () => {
+                    console.log(
+                        await SheetManager.show('text-input-sheet', {
+                            payload: {
+                                title: 'Hi',
+                                fields: [
+                                    {
+                                        label: 'Name',
+                                        placeholder: 'John Doe',
+                                        initialValue: '',
+                                    },
+                                    {
+                                        label: 'Email',
+                                        placeholder: 'john@doe.com',
+                                        initialValue: '',
+                                    },
+                                    {
+                                        label: 'Password',
+                                        placeholder: '********',
+                                        initialValue: '',
+                                        password: true,
+                                        validator: (value) => value.length > 6,
+                                    },
+                                ],
+                            },
+                        }),
+                    );
                 }}>
-                Show sheet
+                Show input sheet
+            </Button>
+            <Button
+                mode="contained"
+                onPress={async () => {
+                    console.log(
+                        await SheetManager.show('confirmation-sheet', {
+                            payload: {
+                                title: 'Hi',
+                            },
+                        }),
+                    );
+                }}>
+                Show confirmation sheet
             </Button>
         </Surface>
     );

@@ -26,6 +26,8 @@ import { SheetProvider } from 'react-native-actions-sheet';
 import '@/lib/sheets';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { BackendUrlProvider } from '@/lib/providers/BackendUrlProvider';
+import { SnackbarToastProvider } from '@/lib/providers/SnackbarToastProvider';
 
 const languageDetector = createLanguageDetector({});
 
@@ -91,14 +93,20 @@ function RootLayout() {
                 <PaperProvider theme={paperTheme}>
                     <GestureHandlerRootView style={{ flex: 1 }}>
                         <SheetProvider>
-                            {/* TODO: handle more than 1 city */}
-                            <SocketIoProvider city="wroclaw">
-                                <Stack screenOptions={{ headerShown: false }}>
-                                    <Stack.Screen name="(tabs)" />
-                                    <Stack.Screen name="+not-found" />
-                                </Stack>
-                                <SystemBars style="auto" />
-                            </SocketIoProvider>
+                            <SnackbarToastProvider>
+                                <BackendUrlProvider>
+                                    <SocketIoProvider>
+                                        <Stack
+                                            screenOptions={{
+                                                headerShown: false,
+                                            }}>
+                                            <Stack.Screen name="(tabs)" />
+                                            <Stack.Screen name="+not-found" />
+                                        </Stack>
+                                        <SystemBars style="auto" />
+                                    </SocketIoProvider>
+                                </BackendUrlProvider>
+                            </SnackbarToastProvider>
                         </SheetProvider>
                     </GestureHandlerRootView>
                 </PaperProvider>

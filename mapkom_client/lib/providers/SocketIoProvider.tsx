@@ -5,22 +5,25 @@ import { ActionSheetRef, SheetManager } from 'react-native-actions-sheet';
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { io, Socket } from 'socket.io-client';
 import { DisconnectDescription } from 'socket.io-client/build/esm/socket';
+import { useBackendUrl } from './BackendUrlProvider';
+import { useSnackbarToast } from './SnackbarToastProvider';
 
 export const SocketIoContext = createContext<Socket | null>(null);
 
 interface SocketIoProviderProps {
     children: React.ReactNode;
-    city: string;
 }
 
-export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
+export function SocketIoProvider({ children }: SocketIoProviderProps) {
     const { t } = useTranslation();
+
+    const { url, auth } = useBackendUrl();
 
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        const newSocket = io(process.env.EXPO_PUBLIC_API_URL, {
-            auth: { city },
+        const newSocket = io(url, {
+            auth,
         });
 
         setSocket(newSocket);
@@ -29,7 +32,9 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
             newSocket.disconnect();
             newSocket.removeAllListeners();
         };
-    }, [city]);
+    }, [url, auth]);
+
+    const showToast = useSnackbarToast();
 
     useEffect(() => {
         if (!socket) {
@@ -70,6 +75,12 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
 
         const connectHandler = () => {
             console.log('socketio connected');
+            if (__DEV__)
+                showToast({
+                    message: 'Connected to SocketIO',
+                    duration: 1000,
+                    showCloseIcon: true,
+                });
         };
         socket.on('connect', connectHandler);
 
@@ -95,7 +106,7 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
             socket.off('connect_error', connectErrorHandler);
             socket.off('disconnect', disconnectHandler);
         };
-    }, [socket, t]);
+    }, [showToast, socket, t]);
 
     return (
         <SocketIoContext.Provider value={socket}>

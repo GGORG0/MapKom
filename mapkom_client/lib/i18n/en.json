@@ -2,13 +2,15 @@
     "aboutPage": {
         "title": "About page"
     },
-    "errorPage": {},
+    "confirmationSheet": {
+        "cancel": "Cancel",
+        "ok": "OK"
+    },
     "errorSheet": {
         "dismiss": "Dismiss",
         "title": "Error!",
         "triggeredBy": "Triggered by:"
     },
-    "indexPage": {},
     "notFoundPage": {
         "goHome": "Go back home",
         "title": "Not found"
@@ -22,5 +24,9 @@
     "tabs": {
         "about": "About",
         "index": "Home"
+    },
+    "textInputSheet": {
+        "cancel": "Cancel",
+        "done": "Done"
     }
 }
