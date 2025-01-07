@@ -1,4 +1,3 @@
-import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
 import React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,13 +17,6 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
     const { t } = useTranslation();
 
     const [socket, setSocket] = useState<Socket | null>(null);
-
-    const router = useRouter();
-    const pathname = usePathname();
-    const { error: pathError, errorTrigger } = useLocalSearchParams<{
-        error?: string;
-        errorTrigger?: string;
-    }>();
 
     useEffect(() => {
         const newSocket = io(process.env.EXPO_PUBLIC_API_URL, {
@@ -103,7 +95,7 @@ export function SocketIoProvider({ children, city }: SocketIoProviderProps) {
             socket.off('connect_error', connectErrorHandler);
             socket.off('disconnect', disconnectHandler);
         };
-    }, [errorTrigger, pathError, pathname, router, socket, t]);
+    }, [socket, t]);
 
     return (
         <SocketIoContext.Provider value={socket}>
