@@ -1,67 +1,64 @@
 {
-  "expo": {
-    "name": "MapKom",
-    "slug": "mapkom",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "mapkom",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "xyz.ggorg.mapkom"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "xyz.ggorg.mapkom"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain"
+    "expo": {
+        "name": "MapKom",
+        "slug": "mapkom",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "scheme": "mapkom",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": false,
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "xyz.ggorg.mapkom"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/adaptive-icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "package": "xyz.ggorg.mapkom"
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/favicon.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/splash-icon.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain"
+                }
+            ],
+            "expo-font",
+            [
+                "react-native-localization-settings",
+                {
+                    "languages": ["en", "pl"]
+                }
+            ],
+            "@maplibre/maplibre-react-native",
+            [
+                "expo-location",
+                {
+                    "isAndroidForegroundServiceEnabled": true
+                }
+            ],
+            [
+                "react-native-edge-to-edge",
+                {
+                    "android": {
+                        "parentTheme": "Material3"
+                    }
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true
         }
-      ],
-      "expo-font",
-      [
-        "react-native-localization-settings",
-        {
-          "languages": [
-            "en",
-            "pl"
-          ]
-        }
-      ],
-      "@maplibre/maplibre-react-native",
-      [
-        "expo-location",
-        {
-          "isAndroidForegroundServiceEnabled": true
-        }
-      ],
-      [
-        "react-native-edge-to-edge",
-        {
-          "android": {
-            "parentTheme": "Material3"
-          }
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
     }
-  }
 }

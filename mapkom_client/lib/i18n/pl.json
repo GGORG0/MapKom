@@ -1,28 +1,26 @@
 {
-  "aboutPage": {
-    "title": "Strona informacyjna"
-  },
-  "errorPage": {
-  },
-  "errorSheet": {
-    "dismiss": "Zamknij",
-    "title": "Błąd!",
-    "triggeredBy": "Wywołany przez:"
-  },
-  "indexPage": {
-  },
-  "notFoundPage": {
-    "goHome": "Wróć na stronę główną",
-    "title": "Nie znaleziono"
-  },
-  "socketIo": {
+    "aboutPage": {
+        "title": "Strona informacyjna"
+    },
+    "errorPage": {},
     "errorSheet": {
-      "title": "Błąd połączenia!",
-      "tryingToReconnect": "Próbuję ponownie połączyć..."
+        "dismiss": "Zamknij",
+        "title": "Błąd!",
+        "triggeredBy": "Wywołany przez:"
+    },
+    "indexPage": {},
+    "notFoundPage": {
+        "goHome": "Wróć na stronę główną",
+        "title": "Nie znaleziono"
+    },
+    "socketIo": {
+        "errorSheet": {
+            "title": "Błąd połączenia!",
+            "tryingToReconnect": "Próbuję ponownie połączyć..."
+        }
+    },
+    "tabs": {
+        "about": "Info",
+        "index": "Główna"
     }
-  },
-  "tabs": {
-    "about": "Info",
-    "index": "Główna"
-  }
 }

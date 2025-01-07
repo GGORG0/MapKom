@@ -6,26 +6,26 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 
 export default function NotFoundScreen() {
-  const { t } = useTranslation();
-  const path = usePathname();
+    const { t } = useTranslation();
+    const path = usePathname();
 
-  return (
-    <Surface style={styles.screen}>
-      <Text variant="displayLarge">{t('notFoundPage.title')}</Text>
+    return (
+        <Surface style={styles.screen}>
+            <Text variant="displayLarge">{t('notFoundPage.title')}</Text>
 
-      <Text style={localStyles.pathDisplay}>{path}</Text>
+            <Text style={localStyles.pathDisplay}>{path}</Text>
 
-      <Link href="/" asChild>
-        <Button icon="home" mode="contained">
-          {t('notFoundPage.goHome')}
-        </Button>
-      </Link>
-    </Surface>
-  );
+            <Link href="/" asChild>
+                <Button icon="home" mode="contained">
+                    {t('notFoundPage.goHome')}
+                </Button>
+            </Link>
+        </Surface>
+    );
 }
 
 const localStyles = StyleSheet.create({
-  pathDisplay: {
-    fontFamily: 'monospace',
-  },
+    pathDisplay: {
+        fontFamily: 'monospace',
+    },
 });

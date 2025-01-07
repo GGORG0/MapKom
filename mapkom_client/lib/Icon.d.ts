@@ -5,17 +5,17 @@ export type MaterialCommunityIcon = keyof typeof GlyphMap;
 export default MaterialCommunityIcon;
 
 export interface Props extends Omit<OriginalProps, 'source'> {
-  source: MaterialCommunityIcon;
+    source: MaterialCommunityIcon;
 }
 
 declare module 'react-native-paper/src/components/Icon' {
-  export type Props = Props;
+    export type Props = Props;
 
-  export default function Icon(props: Props): JSX.Element;
+    export default function Icon(props: Props): JSX.Element;
 }
 
 declare module 'react-native-paper' {
-  export type IconProps = Props;
+    export type IconProps = Props;
 
-  export function Icon(props: IconProps): JSX.Element;
+    export function Icon(props: IconProps): JSX.Element;
 }

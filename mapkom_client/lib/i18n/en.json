@@ -1,28 +1,26 @@
 {
-  "aboutPage": {
-    "title": "About page"
-  },
-  "errorPage": {
-  },
-  "errorSheet": {
-    "dismiss": "Dismiss",
-    "title": "Error!",
-    "triggeredBy": "Triggered by:"
-  },
-  "indexPage": {
-  },
-  "notFoundPage": {
-    "goHome": "Go back home",
-    "title": "Not found"
-  },
-  "socketIo": {
+    "aboutPage": {
+        "title": "About page"
+    },
+    "errorPage": {},
     "errorSheet": {
-      "title": "Connection error!",
-      "tryingToReconnect": "Trying to reconnect..."
+        "dismiss": "Dismiss",
+        "title": "Error!",
+        "triggeredBy": "Triggered by:"
+    },
+    "indexPage": {},
+    "notFoundPage": {
+        "goHome": "Go back home",
+        "title": "Not found"
+    },
+    "socketIo": {
+        "errorSheet": {
+            "title": "Connection error!",
+            "tryingToReconnect": "Trying to reconnect..."
+        }
+    },
+    "tabs": {
+        "about": "About",
+        "index": "Home"
     }
-  },
-  "tabs": {
-    "about": "About",
-    "index": "Home"
-  }
 }
