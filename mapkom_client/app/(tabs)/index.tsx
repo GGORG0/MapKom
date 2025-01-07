@@ -67,7 +67,7 @@ export default function Index() {
     return (
         <Surface style={styles.screen}>
             {/* <Surface elevation={1} style={localStyles.debugView}>
-      </Surface> */}
+            </Surface> */}
 
             <MapLibreGL.MapView
                 style={localStyles.map}
@@ -99,7 +99,6 @@ export default function Index() {
                     }
                     followZoomLevel={followZoom ? 16 : 12}
                     onUserTrackingModeChange={(event) => {
-                        console.log(event.nativeEvent.payload);
                         setFollowUserLocation(
                             event.nativeEvent.payload.followUserLocation,
                         );
@@ -115,15 +114,6 @@ export default function Index() {
                         />
                     </>
                 )}
-
-                <MapLibreGL.VectorSource
-                    id="population"
-                    url="mapbox://examples.8fgz4egr">
-                    <MapLibreGL.CircleLayer
-                        id="sf2010CircleFill"
-                        sourceLayerID="sf2010"
-                    />
-                </MapLibreGL.VectorSource>
             </MapLibreGL.MapView>
 
             <MapFabStack>

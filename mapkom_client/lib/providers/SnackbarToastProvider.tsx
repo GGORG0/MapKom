@@ -28,7 +28,6 @@ export function SnackbarToastProvider({
     const [toasts, setToasts] = useState<ShowSnackbarToastProps[]>([]);
 
     const fn = useCallback((props: ShowSnackbarToastProps) => {
-        console.log('showing toast', props);
         props.key = props.key || Math.random().toString();
         setToasts((prev) => [...prev, props]);
     }, []);
