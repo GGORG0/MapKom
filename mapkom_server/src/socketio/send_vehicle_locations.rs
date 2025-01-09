@@ -36,6 +36,7 @@ pub async fn send_vehicle_locations_to_all(
     city: String,
     (last_updated, vehicles): (DateTime<Utc>, &Vec<VehicleLocation>),
 ) {
+    // TODO: filter by map viewport
     io.to(city)
         .emit("vehicle_locations", &(last_updated, vehicles))
         .expect("Failed to send vehicle list to sockets");

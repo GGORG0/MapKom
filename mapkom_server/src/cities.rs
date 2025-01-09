@@ -70,7 +70,7 @@ impl<'de> Deserialize<'de> for VehicleType {
     }
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct Line {
     pub number: Option<String>,
     pub direction: Option<String>,
@@ -78,7 +78,7 @@ pub struct Line {
     pub vehicle_type: Option<VehicleType>,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct VehicleLocation {
     pub fleet_number: Option<u32>,
     pub plate_number: Option<String>,
@@ -104,6 +104,7 @@ pub(crate) trait LocationSource {
 
     async fn refresh(&mut self) -> Result<DateTime<Utc>>;
     fn query(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>);
+    fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>);
 }
 
 pub trait GtfsFile: for<'de> Deserialize<'de> + serde::de::DeserializeOwned {

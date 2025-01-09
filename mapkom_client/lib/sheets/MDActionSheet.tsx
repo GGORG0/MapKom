@@ -11,11 +11,12 @@ export default function MDActionSheet({
     containerStyle,
     style,
     children,
+    addViewContainer = true,
     ...props
 }: ActionSheetProps &
     React.RefAttributes<ActionSheetRef> & {
         style?: ViewStyle;
-    }) {
+    } & { addViewContainer?: boolean }) {
     const theme = useTheme();
     const insets = useSafeAreaInsets();
 
@@ -31,14 +32,16 @@ export default function MDActionSheet({
             key={key}
             safeAreaInsets={insets}
             {...props}>
-            <View style={{ ...localStyles.container, ...style }}>
-                {children}
-            </View>
+            {addViewContainer && (
+                <View style={{ ...styles.container, ...style }}>
+                    {children}
+                </View>
+            )}
         </ActionSheet>
     );
 }
 
-const localStyles = StyleSheet.create({
+export const styles = StyleSheet.create({
     container: {
         padding: 12,
         alignItems: 'center',

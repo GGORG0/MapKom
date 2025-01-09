@@ -40,6 +40,7 @@ struct OpenDataResponse {
 
 pub struct OpenDataSource {
     cache: Vec<VehicleLocation>,
+    cache_all: Vec<VehicleLocation>,
     last_updated_at: DateTime<Utc>,
 }
 
@@ -50,6 +51,7 @@ impl LocationSource for OpenDataSource {
     {
         Ok(Self {
             cache: Vec::new(),
+            cache_all: Vec::new(),
             last_updated_at: DateTime::from_timestamp_nanos(0),
         })
     }
@@ -58,7 +60,16 @@ impl LocationSource for OpenDataSource {
     async fn refresh(&mut self) -> Result<DateTime<Utc>> {
         let (latest_updated_at, locations) = self.fetch().await?;
 
-        self.cache = locations;
+        self.cache = locations
+            .iter()
+            .filter(|x| x.updated_at.is_some())
+            .filter(|x| {
+                x.updated_at.expect("updated_at is None")
+                    > Utc::now() - chrono::Duration::minutes(5)
+            })
+            .cloned()
+            .collect();
+        self.cache_all = locations;
         self.last_updated_at = latest_updated_at;
 
         Ok(self.last_updated_at)
@@ -66,6 +77,10 @@ impl LocationSource for OpenDataSource {
 
     fn query(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
         (self.last_updated_at, &self.cache)
+    }
+
+    fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
+        (self.last_updated_at, &self.cache_all)
     }
 }
 
@@ -125,13 +140,9 @@ impl OpenDataSource {
             })
             .collect::<Result<Vec<VehicleLocation>>>()?
             .into_iter()
-            .filter(|x| {
-                Wroclaw::sanitize_coordinates(&x.position) &&
-                match x.fleet_number {
-                    Some(fleet_number) => fleet_number >= 1000,
-                    None => false,
-                }
-            })
+            .filter(|x| x.fleet_number.is_some())
+            .filter(|x| x.fleet_number.expect("fleet_number is None") >= 1000)
+            .filter(|x| Wroclaw::sanitize_coordinates(&x.position))
             .collect();
 
         let latest_updated_at = locations

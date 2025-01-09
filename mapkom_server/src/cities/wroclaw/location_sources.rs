@@ -44,4 +44,8 @@ impl WroclawLocationSources {
     pub fn query(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
         self.open_data.query()
     }
+
+    pub fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
+        self.open_data.query_all()
+    }
 }

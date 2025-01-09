@@ -9,7 +9,7 @@ import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
-import { Area, Point } from '@/lib/geometry';
+import { Area } from '@/lib/geometry';
 import { useThrottle } from '@uidotdev/usehooks';
 import {
     useSocketIo,
@@ -17,7 +17,11 @@ import {
 } from '@/lib/providers/SocketIoProvider';
 import { feature, featureCollection } from '@turf/helpers';
 import tramIcon from '@/assets/images/tram.png';
+import tramIconSmall from '@/assets/images/tram-small.png';
 import busIcon from '@/assets/images/bus.png';
+import busIconSmall from '@/assets/images/bus-small.png';
+import { VehicleLocation } from '@/lib/vehicle';
+import { SheetManager } from 'react-native-actions-sheet';
 
 const mapStyles = {
     light: lightStyle,
@@ -48,12 +52,6 @@ export default function Index() {
 
     const [followUserLocation, setFollowUserLocation] = useState(false);
 
-    const [followZoom, setFollowZoom] = useState(false);
-    useEffect(() => {
-        // TODO: fix bug where you have to press the button twice at first
-        if (followUserLocation) setFollowZoom(true);
-    }, [followUserLocation]);
-
     // MAP VIEWPORT //
     const socket = useSocketIo();
 
@@ -71,14 +69,11 @@ export default function Index() {
     }, [throttledViewport, socket]);
 
     // MARKERS //
-    const [tramMarkers, setTramMarkers] = useState(featureCollection([]));
-    const [busMarkers, setBusMarkers] = useState(featureCollection([]));
+    const [markers, setMarkers] = useState(featureCollection([]));
 
     useSocketIoListener(
         'vehicle_locations',
-        (lastUpdated: string, vehicles: VehicleLocation[]) => {
-            const lastUpdatedDate = new Date(lastUpdated);
-
+        (_: string, vehicles: VehicleLocation[]) => {
             const features = vehicles.map((vehicle) =>
                 feature(
                     {
@@ -90,31 +85,12 @@ export default function Index() {
                     },
                     {
                         id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
+                        vehicle,
                     },
                 ),
             );
 
-            setTramMarkers(
-                featureCollection(
-                    features.filter((feature) =>
-                        feature.properties.id
-                            .toString()
-                            .toLowerCase()
-                            .startsWith('tram'),
-                    ),
-                ),
-            );
-
-            setBusMarkers(
-                featureCollection(
-                    features.filter((feature) =>
-                        feature.properties.id
-                            .toString()
-                            .toLowerCase()
-                            .startsWith('bus'),
-                    ),
-                ),
-            );
+            setMarkers(featureCollection(features));
         },
     );
 
@@ -151,7 +127,6 @@ export default function Index() {
                     followUserLocation={
                         locationPermissionStatus?.granted && followUserLocation
                     }
-                    followZoomLevel={followZoom ? 16 : 12}
                     onUserTrackingModeChange={(event) => {
                         setFollowUserLocation(
                             event.nativeEvent.payload.followUserLocation,
@@ -169,35 +144,62 @@ export default function Index() {
                     </>
                 )}
 
-                <MapLibreGL.Animated.ShapeSource
-                    id="tramMarkerSource"
-                    hitbox={{ width: 20, height: 20 }}
-                    shape={tramMarkers}>
-                    <MapLibreGL.Animated.SymbolLayer
+                <MapLibreGL.ShapeSource
+                    id="markerSource"
+                    onPress={({ features }) => {
+                        SheetManager.show('vehicle-sheet', {
+                            payload: {
+                                vehicles: features.map(
+                                    (feature) => feature.properties?.vehicle,
+                                ),
+                            },
+                        });
+                    }}
+                    hitbox={{ width: 50, height: 50 }}
+                    shape={markers}>
+                    <MapLibreGL.SymbolLayer
                         id="tramMarkers"
-                        minZoomLevel={1}
+                        minZoomLevel={13}
                         style={{
                             iconImage: tramIcon,
                             iconAllowOverlap: true,
                             iconSize: 0.2,
                         }}
+                        filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
                     />
-                </MapLibreGL.Animated.ShapeSource>
-
-                <MapLibreGL.Animated.ShapeSource
-                    id="busMarkerSource"
-                    hitbox={{ width: 20, height: 20 }}
-                    shape={busMarkers}>
-                    <MapLibreGL.Animated.SymbolLayer
+                    <MapLibreGL.SymbolLayer
+                        id="tramMarkersSmall"
+                        minZoomLevel={10}
+                        maxZoomLevel={13}
+                        style={{
+                            iconImage: tramIconSmall,
+                            iconAllowOverlap: true,
+                            iconSize: 0.05,
+                        }}
+                        filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
+                    />
+                    <MapLibreGL.SymbolLayer
                         id="busMarkers"
-                        minZoomLevel={1}
+                        minZoomLevel={13}
                         style={{
                             iconImage: busIcon,
                             iconAllowOverlap: true,
                             iconSize: 0.2,
                         }}
+                        filter={['in', ['literal', 'BUS'], ['get', 'id']]}
                     />
-                </MapLibreGL.Animated.ShapeSource>
+                    <MapLibreGL.SymbolLayer
+                        id="busMarkersSmall"
+                        minZoomLevel={10}
+                        maxZoomLevel={13}
+                        style={{
+                            iconImage: busIconSmall,
+                            iconAllowOverlap: true,
+                            iconSize: 0.05,
+                        }}
+                        filter={['in', ['literal', 'BUS'], ['get', 'id']]}
+                    />
+                </MapLibreGL.ShapeSource>
             </MapLibreGL.MapView>
 
             <MapFabStack>
@@ -240,26 +242,3 @@ const localStyles = StyleSheet.create({
     //   zIndex: 100,
     // },
 });
-
-interface VehicleLocation {
-    fleet_number?: number;
-    plate_number?: string;
-    line: {
-        number?: string;
-        direction?: string;
-        brigade?: number;
-        vehicle_type?: string;
-    };
-
-    course_id?: number;
-    delay?: number;
-
-    current_stop?: number;
-    next_stop?: number;
-
-    position: Point;
-
-    direction?: number;
-
-    updated_at?: string;
-}
