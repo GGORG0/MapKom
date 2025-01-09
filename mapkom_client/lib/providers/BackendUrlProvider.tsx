@@ -29,7 +29,7 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
         __DEV__
             ? (
                   (() => {
-                      const scriptURL = NativeModules.SourceCode.scriptURL;
+                      const scriptURL = NativeModules?.SourceCode?.scriptURL;
                       if (!scriptURL) return process.env.EXPO_PUBLIC_API_URL;
                       const url = new URL(scriptURL);
                       return `${url.protocol}//${url.hostname}:8080`;
