@@ -1,6 +1,6 @@
 pub mod send_vehicle_locations;
 
-use crate::{cities::CityMap, geometry::area::Area};
+use crate::cities::CityMap;
 use color_eyre::{Result, eyre::eyre};
 use serde::Deserialize;
 use socketioxide::{
