@@ -3,18 +3,13 @@ import { FAB, Surface } from 'react-native-paper';
 import MapLibreGL from '@maplibre/maplibre-react-native';
 import { Platform, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import lightStyle from '@/lib/mapStyles/light.json';
 import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
-import { Area } from '@/lib/geometry';
-import { useThrottle } from '@uidotdev/usehooks';
-import {
-    useSocketIo,
-    useSocketIoListener,
-} from '@/lib/providers/SocketIoProvider';
+import { useSocketIoListener } from '@/lib/providers/SocketIoProvider';
 import { feature, featureCollection } from '@turf/helpers';
 import tramIcon from '@/assets/images/tram.png';
 import tramIconSmall from '@/assets/images/tram-small.png';
@@ -51,22 +46,6 @@ export default function Index() {
     // TODO: handle approximate location
 
     const [followUserLocation, setFollowUserLocation] = useState(false);
-
-    // MAP VIEWPORT //
-    const socket = useSocketIo();
-
-    const [viewport, setViewport] = useState<Area>({
-        north_west: { lat: 0, lng: 0 },
-        south_east: { lat: 0, lng: 0 },
-    });
-
-    const throttledViewport = useThrottle(viewport, 500);
-
-    useEffect(() => {
-        if (socket) {
-            socket.emit('update_viewport', throttledViewport);
-        }
-    }, [throttledViewport, socket]);
 
     // MARKERS //
     const [markers, setMarkers] = useState(featureCollection([]));
@@ -108,19 +87,6 @@ export default function Index() {
                 compassViewMargins={{
                     y: Platform.OS === 'ios' ? 0 : Math.max(insets.top, 8),
                     x: insets.right + 8,
-                }}
-                onRegionIsChanging={(feature) => {
-                    const bounds = feature.properties.visibleBounds;
-                    setViewport({
-                        north_west: {
-                            lat: bounds[0][1],
-                            lng: bounds[1][0],
-                        },
-                        south_east: {
-                            lat: bounds[1][1],
-                            lng: bounds[0][0],
-                        },
-                    });
                 }}>
                 <MapLibreGL.Camera
                     animationMode="flyTo"

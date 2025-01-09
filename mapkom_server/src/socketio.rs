@@ -1,5 +1,4 @@
 pub mod send_vehicle_locations;
-pub mod update_viewport;
 
 use crate::{cities::CityMap, geometry::area::Area};
 use color_eyre::{Result, eyre::eyre};
@@ -17,8 +16,6 @@ use tracing::{debug, warn};
 #[derive(Debug)]
 pub struct SocketState {
     pub city: String,
-
-    pub viewport: Area,
 }
 
 pub type SocketStateWrapped = Arc<RwLock<SocketState>>;
@@ -37,7 +34,6 @@ fn connection_middleware(
     if city_map.contains_key(&auth.city) {
         let state = SocketState {
             city: auth.city.clone(),
-            viewport: ((0.0, 0.0), (0.0, 0.0)).into(),
         };
         s.extensions.insert(Arc::new(RwLock::new(state)));
 
@@ -56,9 +52,7 @@ fn connection_middleware(
     }
 }
 
-async fn handle_connection(s: SocketRef) {
-    s.on("update_viewport", update_viewport::update_viewport);
-}
+async fn handle_connection() {}
 
 pub fn init(city_map: CityMap) -> (SocketIoLayer, SocketIo) {
     let (layer, io) = SocketIoBuilder::new().with_state(city_map).build_layer();

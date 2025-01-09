@@ -21,10 +21,7 @@ pub async fn send_vehicle_locations(
     let city = city.read().await;
     let (last_updated, vehicles) = city.vehicle_locations();
 
-    let vehicles = vehicles
-        .iter()
-        .filter(|vehicle| vehicle.position.in_area_with_margin(&state.viewport, 0.15))
-        .collect::<Vec<_>>();
+    let vehicles = vehicles.iter().collect::<Vec<_>>();
 
     s.emit("vehicle_locations", &(last_updated, vehicles))
         .expect("Failed to send vehicle list to socket");
@@ -36,7 +33,6 @@ pub async fn send_vehicle_locations_to_all(
     city: String,
     (last_updated, vehicles): (DateTime<Utc>, &Vec<VehicleLocation>),
 ) {
-    // TODO: filter by map viewport
     io.to(city)
         .emit("vehicle_locations", &(last_updated, vehicles))
         .expect("Failed to send vehicle list to sockets");
