@@ -41,7 +41,6 @@ pub struct MpkWebApiSource {
     lines: Vec<Line>,
 
     cache: Vec<VehicleLocation>,
-    cache_all: Vec<VehicleLocation>,
     last_updated_at: DateTime<Utc>,
 }
 
@@ -54,7 +53,6 @@ impl LocationSource for MpkWebApiSource {
             lines: Self::fetch_lines().await?,
 
             cache: Vec::new(),
-            cache_all: Vec::new(),
             last_updated_at: DateTime::from_timestamp_nanos(0),
         })
     }
@@ -63,13 +61,7 @@ impl LocationSource for MpkWebApiSource {
     async fn refresh(&mut self) -> Result<DateTime<Utc>> {
         let locations = self.fetch().await?;
 
-        self.cache = locations
-            .iter()
-            .filter(|x| x.updated_at.is_some())
-            .filter(|x| x.updated_at.expect("updated_at is None") > Utc::now() - chrono::Duration::minutes(5))
-            .cloned()
-            .collect();
-        self.cache_all = locations;
+        self.cache = locations;
         self.last_updated_at = Utc::now();
 
         Ok(self.last_updated_at)
@@ -80,7 +72,7 @@ impl LocationSource for MpkWebApiSource {
     }
 
     fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
-        (self.last_updated_at, &self.cache_all)
+        (self.last_updated_at, &self.cache)
     }
 }
 

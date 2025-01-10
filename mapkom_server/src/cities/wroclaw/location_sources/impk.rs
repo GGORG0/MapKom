@@ -48,7 +48,6 @@ struct ImpkApiResponse {
 
 pub struct ImpkApiSource {
     cache: Vec<VehicleLocation>,
-    cache_all: Vec<VehicleLocation>,
     last_updated_at: DateTime<Utc>,
 }
 
@@ -59,7 +58,6 @@ impl LocationSource for ImpkApiSource {
     {
         Ok(Self {
             cache: Vec::new(),
-            cache_all: Vec::new(),
             last_updated_at: DateTime::from_timestamp_nanos(0),
         })
     }
@@ -68,16 +66,7 @@ impl LocationSource for ImpkApiSource {
     async fn refresh(&mut self) -> Result<DateTime<Utc>> {
         let (latest_updated_at, locations) = self.fetch().await?;
 
-        self.cache = locations
-            .iter()
-            .filter(|x| x.updated_at.is_some())
-            .filter(|x| {
-                x.updated_at.expect("updated_at is None")
-                    > Utc::now() - chrono::Duration::minutes(5)
-            })
-            .cloned()
-            .collect();
-        self.cache_all = locations;
+        self.cache = locations;
         self.last_updated_at = latest_updated_at;
 
         Ok(self.last_updated_at)
@@ -88,7 +77,7 @@ impl LocationSource for ImpkApiSource {
     }
 
     fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
-        (self.last_updated_at, &self.cache_all)
+        (self.last_updated_at, &self.cache)
     }
 }
 
