@@ -1,9 +1,9 @@
 import { styles } from '@/lib/styles';
 import { FAB, Surface } from 'react-native-paper';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import MapLibreGL, { CameraRef } from '@maplibre/maplibre-react-native';
 import { Platform, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import lightStyle from '@/lib/mapStyles/light.json';
 import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
@@ -49,29 +49,29 @@ export default function Index() {
     const [markers, setMarkers] = useState(featureCollection([]));
 
     // TODO: move this to the backend (maybe)
-    useSocketIoListener(
-        'vehicle_locations',
-        (_: string, vehicles: VehicleLocation[]) => {
-            const features = vehicles.map((vehicle) =>
-                feature(
-                    {
-                        type: 'Point',
-                        coordinates: [
-                            vehicle.position.lng,
-                            vehicle.position.lat,
-                        ],
-                    },
-                    {
-                        id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
-                        vehicle,
-                        line: vehicle.line.number || '?',
-                    },
-                ),
-            );
+    const listener = useCallback((_: string, vehicles: VehicleLocation[]) => {
+        const features = vehicles.map((vehicle) =>
+            feature(
+                {
+                    type: 'Point',
+                    coordinates: [vehicle.position.lng, vehicle.position.lat],
+                },
+                {
+                    id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
+                    vehicle,
+                    line: vehicle.line.number || '?',
+                },
+            ),
+        );
 
-            setMarkers(featureCollection(features));
-        },
-    );
+        setMarkers(featureCollection(features));
+    }, []);
+
+    useSocketIoListener('vehicle_locations', listener);
+
+    const cameraRef = useRef<CameraRef>(null);
+
+    const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
 
     return (
         <Surface style={styles.screen}>
@@ -89,6 +89,7 @@ export default function Index() {
                     x: insets.right + 8,
                 }}>
                 <MapLibreGL.Camera
+                    ref={cameraRef}
                     animationMode="flyTo"
                     followUserLocation={
                         locationPermissionStatus?.granted && followUserLocation
@@ -118,6 +119,8 @@ export default function Index() {
                                 vehicles: features.map(
                                     (feature) => feature.properties?.vehicle,
                                 ),
+                                setSelectedMarker,
+                                cameraRef,
                             },
                         });
                     }}
@@ -135,7 +138,23 @@ export default function Index() {
                             textFont: ['Noto Sans Regular'],
                             textColor: '#fff',
                         }}
-                        filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
+                        filter={
+                            selectedMarker
+                                ? [
+                                      'all',
+                                      [
+                                          'in',
+                                          ['literal', 'TRAM'],
+                                          ['get', 'id'],
+                                      ],
+                                      [
+                                          'in',
+                                          ['literal', selectedMarker],
+                                          ['get', 'id'],
+                                      ],
+                                  ]
+                                : ['in', ['literal', 'TRAM'], ['get', 'id']]
+                        }
                     />
                     <MapLibreGL.SymbolLayer
                         id="tramMarkersSmall"
@@ -151,7 +170,7 @@ export default function Index() {
                     {/* BUSES */}
                     <MapLibreGL.SymbolLayer
                         id="busMarkers"
-                        minZoomLevel={13}
+                        minZoomLevel={selectedMarker ? 1 : 13}
                         style={{
                             iconImage: busIconSmall,
                             iconAllowOverlap: true,
@@ -160,7 +179,19 @@ export default function Index() {
                             textFont: ['Noto Sans Regular'],
                             textColor: '#fff',
                         }}
-                        filter={['in', ['literal', 'BUS'], ['get', 'id']]}
+                        filter={
+                            selectedMarker
+                                ? [
+                                      'all',
+                                      ['in', ['literal', 'BUS'], ['get', 'id']],
+                                      [
+                                          'in',
+                                          ['literal', selectedMarker],
+                                          ['get', 'id'],
+                                      ],
+                                  ]
+                                : ['in', ['literal', 'BUS'], ['get', 'id']]
+                        }
                     />
                     <MapLibreGL.SymbolLayer
                         id="busMarkersSmall"

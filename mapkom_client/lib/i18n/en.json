@@ -28,5 +28,9 @@
     "textInputSheet": {
         "cancel": "Cancel",
         "done": "Done"
+    },
+    "vehicleSheet": {
+        "soon": "You will be able to see the next stops and the vehicle's delay here soon! Stay tuned for an update.",
+        "timeFormat": "{{time}} ago"
     }
 }

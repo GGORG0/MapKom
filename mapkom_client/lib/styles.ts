@@ -9,3 +9,8 @@ export const styles = StyleSheet.create({
         position: 'relative',
     },
 });
+
+export const customColors = {
+    TRAM: '#1565C0',
+    BUS: '#2E7D32',
+};

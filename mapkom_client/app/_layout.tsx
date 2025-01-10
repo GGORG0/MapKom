@@ -20,7 +20,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import resources from '@/lib/i18n';
 import { createLanguageDetector } from 'react-native-localization-settings';
-import { SocketIoProvider } from '@/lib/providers/SocketIoProvider';
+import {
+    SocketIoErrorHandler,
+    SocketIoProvider,
+} from '@/lib/providers/SocketIoProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SheetProvider } from 'react-native-actions-sheet';
 import '@/lib/sheets';
@@ -92,10 +95,10 @@ function RootLayout() {
                 }>
                 <PaperProvider theme={paperTheme}>
                     <GestureHandlerRootView style={{ flex: 1 }}>
-                        <SheetProvider>
-                            <SnackbarToastProvider>
-                                <BackendUrlProvider>
-                                    <SocketIoProvider>
+                        <SnackbarToastProvider>
+                            <BackendUrlProvider>
+                                <SocketIoProvider>
+                                    <SheetProvider>
                                         <Stack
                                             screenOptions={{
                                                 headerShown: false,
@@ -104,10 +107,11 @@ function RootLayout() {
                                             <Stack.Screen name="+not-found" />
                                         </Stack>
                                         <SystemBars style="auto" />
-                                    </SocketIoProvider>
-                                </BackendUrlProvider>
-                            </SnackbarToastProvider>
-                        </SheetProvider>
+                                        <SocketIoErrorHandler />
+                                    </SheetProvider>
+                                </SocketIoProvider>
+                            </BackendUrlProvider>
+                        </SnackbarToastProvider>
                     </GestureHandlerRootView>
                 </PaperProvider>
             </ThemeProvider>

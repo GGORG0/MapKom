@@ -28,5 +28,9 @@
     "textInputSheet": {
         "cancel": "Anuluj",
         "done": "Gotowe"
+    },
+    "vehicleSheet": {
+        "soon": "Już niedługo będziesz mógł zobaczyć tutaj kolejne przystanki i opóźnienia pojazdu! Poczekaj na aktualizację aplikacji.",
+        "timeFormat": "{{time}} temu"
     }
 }

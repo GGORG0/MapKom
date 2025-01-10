@@ -27,6 +27,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@animatereactnative/marquee@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@animatereactnative/marquee@npm:0.3.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: ">=2.2.0"
+  checksum: 10c0/50672504402191aaf7ee56e2aaad2e16230f1560e0b30362db88466e692b48bbe711d765b8c85f604c4356f44e8cd8e87dbbd53c87931ddb68f5d4acca9821de
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:7.10.4, @babel/code-frame@npm:~7.10.4":
   version: 7.10.4
   resolution: "@babel/code-frame@npm:7.10.4"
@@ -2210,6 +2221,18 @@ __metadata:
   version: 0.2.7
   resolution: "@material/material-color-utilities@npm:0.2.7"
   checksum: 10c0/7734f8d7cffe6a92d47fcca82b4846e39ffd79be9c057f3299466696dcdee5379b8a8a3aa6a9692d40bd6900905f689105d9a8ce47882ab22348df10621f70cd
+  languageName: node
+  linkType: hard
+
+"@n1ru4l/react-time-ago@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@n1ru4l/react-time-ago@npm:1.1.0"
+  dependencies:
+    prop-types: "npm:^15.6.0"
+    zen-observable: "npm:^0.8.6"
+  peerDependencies:
+    react: ^16.0.0
+  checksum: 10c0/e60e354688fd84736c53ac2c47764b53b0cde60fbd11350350123923a3e777dacfaee7a6e90c7f718c54d3adb661c0d81cd7cef3b87e4bffaefe47740f73167f
   languageName: node
   linkType: hard
 
@@ -4646,6 +4669,13 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/ff8f54fc49621210291f815fe5b15d809fd7d032941b3180743440bd507ecdf08b9e844625fa346af568c84bf34114eb378dcdc3e921a08ba1e2a08d7e3c809c
+  languageName: node
+  linkType: hard
+
+"@types/ms@npm:^0.7.34":
+  version: 0.7.34
+  resolution: "@types/ms@npm:0.7.34"
+  checksum: 10c0/ac80bd90012116ceb2d188fde62d96830ca847823e8ca71255616bc73991aa7d9f057b8bfab79e8ee44ffefb031ddd1bcce63ea82f9e66f7c31ec02d2d823ccc
   languageName: node
   linkType: hard
 
@@ -10476,17 +10506,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mapkom_client@workspace:."
   dependencies:
+    "@animatereactnative/marquee": "npm:^0.3.1"
     "@babel/core": "npm:^7.25.2"
     "@expo-google-fonts/inter": "npm:^0.2.3"
     "@expo/ngrok": "npm:^4.1.3"
     "@expo/vector-icons": "npm:^14.0.4"
     "@maplibre/maplibre-react-native": "npm:10.0.0-alpha.28"
+    "@n1ru4l/react-time-ago": "npm:^1.1.0"
     "@pchmn/expo-material3-theme": "npm:^1.3.2"
     "@react-navigation/bottom-tabs": "npm:^7.0.0"
     "@react-navigation/native": "npm:^7.0.0"
     "@turf/helpers": "npm:^7.2.0"
     "@turf/turf": "npm:^7.2.0"
     "@types/jest": "npm:^29.5.12"
+    "@types/ms": "npm:^0.7.34"
     "@types/react": "npm:~18.3.12"
     "@types/react-test-renderer": "npm:^18.3.0"
     "@uidotdev/usehooks": "npm:^2.4.1"
@@ -10511,6 +10544,7 @@ __metadata:
     i18next: "npm:^24.2.0"
     jest: "npm:^29.2.1"
     jest-expo: "npm:~52.0.2"
+    ms: "npm:^2.1.3"
     prettier: "npm:^3.4.2"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
@@ -11927,7 +11961,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -14980,5 +15014,12 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zen-observable@npm:^0.8.6":
+  version: 0.8.15
+  resolution: "zen-observable@npm:0.8.15"
+  checksum: 10c0/71cc2f2bbb537300c3f569e25693d37b3bc91f225cefce251a71c30bc6bb3e7f8e9420ca0eb57f2ac9e492b085b8dfa075fd1e8195c40b83c951dd59c6e4fbf8
   languageName: node
   linkType: hard

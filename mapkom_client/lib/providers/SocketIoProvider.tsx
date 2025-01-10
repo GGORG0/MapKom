@@ -15,8 +15,6 @@ interface SocketIoProviderProps {
 }
 
 export function SocketIoProvider({ children }: SocketIoProviderProps) {
-    const { t } = useTranslation();
-
     const { url, auth } = useBackendUrl();
 
     const [socket, setSocket] = useState<Socket | null>(null);
@@ -34,6 +32,50 @@ export function SocketIoProvider({ children }: SocketIoProviderProps) {
         };
     }, [url, auth]);
 
+    return (
+        <SocketIoContext.Provider value={socket}>
+            {children}
+        </SocketIoContext.Provider>
+    );
+}
+
+export function useSocketIo() {
+    return useContext(SocketIoContext);
+}
+
+export function useSocketIoListener(
+    event: string,
+    listener: (...args: any[]) => void,
+) {
+    const socket = useSocketIo();
+
+    useEffect(() => {
+        if (!socket) {
+            return;
+        }
+
+        socket.on(event, listener);
+
+        return () => {
+            socket.off(event, listener);
+        };
+    }, [event, listener, socket]);
+}
+
+function ErrorSheetSpinner() {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <ActivityIndicator />
+            <Text>{t('socketIo.errorSheet.tryingToReconnect')}</Text>
+        </>
+    );
+}
+
+export function SocketIoErrorHandler() {
+    const { t } = useTranslation();
+    const socket = useSocketIo();
     const showToast = useSnackbarToast();
 
     useEffect(() => {
@@ -108,43 +150,5 @@ export function SocketIoProvider({ children }: SocketIoProviderProps) {
         };
     }, [showToast, socket, t]);
 
-    return (
-        <SocketIoContext.Provider value={socket}>
-            {children}
-        </SocketIoContext.Provider>
-    );
-}
-
-export function useSocketIo() {
-    return useContext(SocketIoContext);
-}
-
-export function useSocketIoListener(
-    event: string,
-    listener: (...args: any[]) => void,
-) {
-    const socket = useSocketIo();
-
-    useEffect(() => {
-        if (!socket) {
-            return;
-        }
-
-        socket.on(event, listener);
-
-        return () => {
-            socket.off(event, listener);
-        };
-    }, [event, listener, socket]);
-}
-
-function ErrorSheetSpinner() {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            <ActivityIndicator />
-            <Text>{t('socketIo.errorSheet.tryingToReconnect')}</Text>
-        </>
-    );
+    return null;
 }
