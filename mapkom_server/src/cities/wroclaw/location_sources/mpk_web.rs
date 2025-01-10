@@ -54,7 +54,7 @@ impl LocationSource for MpkWebApiSource {
 
             cache: Vec::new(),
             last_updated_at: DateTime::from_timestamp_nanos(0),
-        })
+        }) 
     }
 
     #[instrument(name = "mpk_web_refresh", skip(self), level = "debug")]

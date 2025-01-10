@@ -11,9 +11,7 @@ import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
 import { useSocketIoListener } from '@/lib/providers/SocketIoProvider';
 import { feature, featureCollection } from '@turf/helpers';
-import tramIcon from '@/assets/images/tram.png';
 import tramIconSmall from '@/assets/images/tram-small.png';
-import busIcon from '@/assets/images/bus.png';
 import busIconSmall from '@/assets/images/bus-small.png';
 import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
@@ -50,6 +48,7 @@ export default function Index() {
     // MARKERS //
     const [markers, setMarkers] = useState(featureCollection([]));
 
+    // TODO: move this to the backend (maybe)
     useSocketIoListener(
         'vehicle_locations',
         (_: string, vehicles: VehicleLocation[]) => {
@@ -65,6 +64,7 @@ export default function Index() {
                     {
                         id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
                         vehicle,
+                        line: vehicle.line.number || '?',
                     },
                 ),
             );
@@ -123,13 +123,17 @@ export default function Index() {
                     }}
                     hitbox={{ width: 50, height: 50 }}
                     shape={markers}>
+                    {/* TRAMS */}
                     <MapLibreGL.SymbolLayer
                         id="tramMarkers"
                         minZoomLevel={13}
                         style={{
-                            iconImage: tramIcon,
+                            iconImage: tramIconSmall,
                             iconAllowOverlap: true,
                             iconSize: 0.2,
+                            textField: ['get', 'line'],
+                            textFont: ['Noto Sans Regular'],
+                            textColor: '#fff',
                         }}
                         filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
                     />
@@ -144,13 +148,17 @@ export default function Index() {
                         }}
                         filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
                     />
+                    {/* BUSES */}
                     <MapLibreGL.SymbolLayer
                         id="busMarkers"
                         minZoomLevel={13}
                         style={{
-                            iconImage: busIcon,
+                            iconImage: busIconSmall,
                             iconAllowOverlap: true,
                             iconSize: 0.2,
+                            textField: ['get', 'line'],
+                            textFont: ['Noto Sans Regular'],
+                            textColor: '#fff',
                         }}
                         filter={['in', ['literal', 'BUS'], ['get', 'id']]}
                     />
