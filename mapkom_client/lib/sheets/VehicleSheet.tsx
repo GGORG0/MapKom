@@ -138,8 +138,9 @@ function VehicleDetailsSheetHeader({ vehicle }: { vehicle: VehicleLocation }) {
     const theme = useTheme();
 
     const date = useMemo(
-        () => (vehicle.updated_at ? new Date(vehicle.updated_at) : null),
-        [vehicle.updated_at],
+        () =>
+            vehicle.real_updated_at ? new Date(vehicle.real_updated_at) : null,
+        [vehicle.real_updated_at],
     );
 
     return (

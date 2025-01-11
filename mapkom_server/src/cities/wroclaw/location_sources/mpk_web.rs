@@ -160,6 +160,7 @@ impl MpkWebApiSource {
                     position: Point::new(item.lat, item.lng),
                     heading: None,
                     updated_at: None,
+                    real_updated_at: None
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?

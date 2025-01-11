@@ -24,6 +24,28 @@ pub mod point {
         pub fn in_area_with_margin(&self, area: &Area, margin_percent: f64) -> bool {
             area.contains_with_margin(self, margin_percent)
         }
+
+        pub fn angle_to(&self, other: &Self) -> f64 {
+            use std::f64::consts::PI;
+
+            fn to_radians(deg: f64) -> f64 {
+                deg * PI / 180.0
+            }
+
+            fn to_degrees(rad: f64) -> f64 {
+                rad * 180.0 / PI
+            }
+
+            let phi1 = to_radians(self.lat);
+            let phi2 = to_radians(other.lat);
+            let delta_lambda = to_radians(other.lng - self.lng);
+
+            let y = delta_lambda.sin() * phi2.cos();
+            let x = phi1.cos() * phi2.sin() - phi1.sin() * phi2.cos() * delta_lambda.cos();
+            let theta = y.atan2(x);
+
+            (to_degrees(theta) + 360.0) % 360.0
+        }
     }
 
     impl From<(f64, f64)> for Point {

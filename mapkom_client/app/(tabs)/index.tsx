@@ -1,6 +1,7 @@
 import { styles } from '@/lib/styles';
 import { FAB, Surface } from 'react-native-paper';
-import MapLibreGL, { CameraRef } from '@maplibre/maplibre-react-native';
+import * as MapLibreGL from '@maplibre/maplibre-react-native';
+import { CameraRef } from '@maplibre/maplibre-react-native';
 import { Platform, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -11,10 +12,16 @@ import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
 import { useSocketIoListener } from '@/lib/providers/SocketIoProvider';
 import { feature, featureCollection } from '@turf/helpers';
-import tramIconSmall from '@/assets/images/tram-small.png';
-import busIconSmall from '@/assets/images/bus-small.png';
+import iconTramPointer from '@/assets/images/iconTramPointer.png';
+import iconTramSmall from '@/assets/images/iconTramSmall.png';
+import iconBusPointer from '@/assets/images/iconBusPointer.png';
+import iconBusSmall from '@/assets/images/iconBusSmall.png';
 import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
+import {
+    FormattedString,
+    Value,
+} from '@maplibre/maplibre-react-native/lib/typescript/commonjs/src/types/MapLibreRNStyles';
 
 const mapStyles = {
     light: lightStyle,
@@ -60,6 +67,8 @@ export default function Index() {
                     id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
                     vehicle,
                     line: vehicle.line.number,
+                    vehicleType: vehicle.line.vehicle_type,
+                    heading: vehicle.heading,
                 },
             ),
         );
@@ -80,7 +89,7 @@ export default function Index() {
 
             <MapLibreGL.MapView
                 style={localStyles.map}
-                styleJSON={mapStyleString}
+                mapStyle={mapStyleString}
                 localizeLabels={false}
                 pitchEnabled={false}
                 logoEnabled={true}
@@ -111,6 +120,15 @@ export default function Index() {
                     </>
                 )}
 
+                <MapLibreGL.Images
+                    images={{
+                        iconTramPointer: iconTramPointer,
+                        iconTramSmall: iconTramSmall,
+                        iconBusPointer: iconBusPointer,
+                        iconBusSmall: iconBusSmall,
+                    }}
+                />
+
                 {/* TODO: use a vector marker */}
                 {/* TODO: animate the markers */}
                 {/* TODO: fix markers clumping up even though i set iconAllowOverlap */}
@@ -136,24 +154,28 @@ export default function Index() {
                         style={{
                             ...markerStyles.marker,
                             ...markerStyles.bigMarker,
-                            ...markerStyles.tramIcon,
+                            iconImage: 'iconTramPointer',
                         }}
                         filter={
                             selectedMarker
                                 ? [
                                       'all',
                                       [
-                                          'in',
+                                          '==',
                                           ['literal', 'TRAM'],
-                                          ['get', 'id'],
+                                          ['get', 'vehicleType'],
                                       ],
                                       [
-                                          'in',
+                                          '==',
                                           ['literal', selectedMarker],
                                           ['get', 'id'],
                                       ],
                                   ]
-                                : ['in', ['literal', 'TRAM'], ['get', 'id']]
+                                : [
+                                      '==',
+                                      ['literal', 'TRAM'],
+                                      ['get', 'vehicleType'],
+                                  ]
                         }
                     />
                     <MapLibreGL.SymbolLayer
@@ -163,9 +185,13 @@ export default function Index() {
                         style={{
                             ...markerStyles.marker,
                             ...markerStyles.smallMarker,
-                            ...markerStyles.tramIcon,
+                            iconImage: 'iconTramSmall',
                         }}
-                        filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
+                        filter={[
+                            '==',
+                            ['literal', 'TRAM'],
+                            ['get', 'vehicleType'],
+                        ]}
                     />
                     {/* BUSES */}
                     <MapLibreGL.SymbolLayer
@@ -174,20 +200,28 @@ export default function Index() {
                         style={{
                             ...markerStyles.marker,
                             ...markerStyles.bigMarker,
-                            ...markerStyles.busIcon,
+                            iconImage: 'iconBusPointer',
                         }}
                         filter={
                             selectedMarker
                                 ? [
                                       'all',
-                                      ['in', ['literal', 'BUS'], ['get', 'id']],
+                                      [
+                                          '==',
+                                          ['literal', 'BUS'],
+                                          ['get', 'vehicleType'],
+                                      ],
                                       [
                                           'in',
                                           ['literal', selectedMarker],
                                           ['get', 'id'],
                                       ],
                                   ]
-                                : ['in', ['literal', 'BUS'], ['get', 'id']]
+                                : [
+                                      '==',
+                                      ['literal', 'BUS'],
+                                      ['get', 'vehicleType'],
+                                  ]
                         }
                     />
                     <MapLibreGL.SymbolLayer
@@ -197,9 +231,13 @@ export default function Index() {
                         style={{
                             ...markerStyles.marker,
                             ...markerStyles.smallMarker,
-                            ...markerStyles.busIcon,
+                            iconImage: 'iconBusSmall',
                         }}
-                        filter={['in', ['literal', 'BUS'], ['get', 'id']]}
+                        filter={[
+                            '==',
+                            ['literal', 'BUS'],
+                            ['get', 'vehicleType'],
+                        ]}
                     />
                 </MapLibreGL.ShapeSource>
             </MapLibreGL.MapView>
@@ -245,13 +283,18 @@ const localStyles = StyleSheet.create({
     // },
 });
 
-const markerStyles = {
+const markerStyles: Record<string, MapLibreGL.SymbolLayerStyle> = {
     marker: {
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
+
+        iconPitchAlignment: 'map',
+        iconRotationAlignment: 'map',
     },
     bigMarker: {
-        iconSize: 0.2,
+        iconSize: 0.15,
+        iconRotate: ['get', 'heading'],
+
         textField: ['get', 'line'],
         textFont: ['Noto Sans Regular'],
         textColor: '#fff',
@@ -262,12 +305,6 @@ const markerStyles = {
         textIgnorePlacement: true,
     },
     smallMarker: {
-        iconSize: 0.05,
-    },
-    tramIcon: {
-        iconImage: tramIconSmall,
-    },
-    busIcon: {
-        iconImage: busIconSmall,
+        iconSize: 0.04,
     },
 };

@@ -47,6 +47,8 @@ impl WroclawLocationSources {
     }
 
     pub fn update_cache(&mut self) {
+        let previous = self.locations.clone();
+
         let (impk_updated_at, impk_locations) = self.impk.query();
         let (open_data_updated_at, open_data_locations) = self.open_data.query();
 
@@ -70,15 +72,32 @@ impl WroclawLocationSources {
         }
 
         for loc in open_data_locations {
-            if let Some(existing_loc) = combined_locations
-                .iter_mut()
-                .find(|l| l.fleet_number == loc.fleet_number)
-            {
-                if loc.updated_at > existing_loc.updated_at {
+            if seen_fleet_numbers.contains(&loc.fleet_number) {
+                if let Some(existing_loc) = combined_locations
+                    .iter_mut()
+                    .find(|l| l.fleet_number == loc.fleet_number)
+                {
+                    // This basically forces the iMPK locations, because they don't have individual timestamps and will 99% of the time be more up-to-date
+                    // if loc.updated_at > existing_loc.updated_at {
                     *existing_loc = loc.clone();
+                    // }
                 }
             } else {
                 combined_locations.push(loc.clone());
+            }
+        }
+
+        for loc in combined_locations.iter_mut() {
+            if let Some(previous) = previous.iter().find(|l| l.fleet_number == loc.fleet_number) {
+                if previous.position != loc.position {
+                    loc.real_updated_at = Some(updated_at);
+                    loc.heading = Some(previous.position.angle_to(&loc.position));
+                } else {
+                    loc.real_updated_at = previous.real_updated_at;
+                    loc.heading = previous.heading;
+                }
+            } else {
+                loc.real_updated_at = Some(updated_at);
             }
         }
 

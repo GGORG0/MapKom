@@ -15,6 +15,7 @@ export interface VehicleLocation {
     heading?: number;
 
     updated_at?: string;
+    real_updated_at?: string;
 }
 
 type VehicleType = 'TRAM' | 'BUS';

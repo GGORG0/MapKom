@@ -133,6 +133,7 @@ impl OpenDataSource {
                         .single()
                         .context("Local timezone conversion failed")?
                         .to_utc()),
+                    real_updated_at: None,
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?

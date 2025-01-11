@@ -134,6 +134,7 @@ impl ImpkApiSource {
                     position: Point::new(item.lat, item.lng),
                     heading: None,
                     updated_at: Some(date),
+                    real_updated_at: None,
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?

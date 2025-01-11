@@ -88,9 +88,10 @@ pub struct VehicleLocation {
     pub line: Line,
 
     pub position: Point,
-    pub heading: Option<u16>,
+    pub heading: Option<f64>,
 
     pub updated_at: Option<DateTime<Utc>>,
+    pub real_updated_at: Option<DateTime<Utc>>,
 }
 
 pub(crate) trait LocationSource {
