@@ -113,6 +113,7 @@ export default function Index() {
 
                 {/* TODO: use a vector marker */}
                 {/* TODO: animate the markers */}
+                {/* TODO: fix markers clumping up even though i set iconAllowOverlap */}
                 <MapLibreGL.ShapeSource
                     id="markerSource"
                     onPress={({ features }) => {
@@ -133,13 +134,9 @@ export default function Index() {
                         id="tramMarkers"
                         minZoomLevel={13}
                         style={{
-                            iconImage: tramIconSmall,
-                            iconAllowOverlap: true,
-                            iconSize: 0.2,
-                            textField: ['get', 'line'],
-                            textFont: ['Noto Sans Regular'],
-                            textColor: '#fff',
-                            textSize: 14,
+                            ...markerStyles.marker,
+                            ...markerStyles.bigMarker,
+                            ...markerStyles.tramIcon,
                         }}
                         filter={
                             selectedMarker
@@ -161,12 +158,12 @@ export default function Index() {
                     />
                     <MapLibreGL.SymbolLayer
                         id="tramMarkersSmall"
-                        minZoomLevel={10}
+                        minZoomLevel={9}
                         maxZoomLevel={13}
                         style={{
-                            iconImage: tramIconSmall,
-                            iconAllowOverlap: true,
-                            iconSize: 0.05,
+                            ...markerStyles.marker,
+                            ...markerStyles.smallMarker,
+                            ...markerStyles.tramIcon,
                         }}
                         filter={['in', ['literal', 'TRAM'], ['get', 'id']]}
                     />
@@ -175,13 +172,9 @@ export default function Index() {
                         id="busMarkers"
                         minZoomLevel={13}
                         style={{
-                            iconImage: busIconSmall,
-                            iconAllowOverlap: true,
-                            iconSize: 0.2,
-                            textField: ['get', 'line'],
-                            textFont: ['Noto Sans Regular'],
-                            textColor: '#fff',
-                            textSize: 14,
+                            ...markerStyles.marker,
+                            ...markerStyles.bigMarker,
+                            ...markerStyles.busIcon,
                         }}
                         filter={
                             selectedMarker
@@ -199,12 +192,12 @@ export default function Index() {
                     />
                     <MapLibreGL.SymbolLayer
                         id="busMarkersSmall"
-                        minZoomLevel={10}
+                        minZoomLevel={9}
                         maxZoomLevel={13}
                         style={{
-                            iconImage: busIconSmall,
-                            iconAllowOverlap: true,
-                            iconSize: 0.05,
+                            ...markerStyles.marker,
+                            ...markerStyles.smallMarker,
+                            ...markerStyles.busIcon,
                         }}
                         filter={['in', ['literal', 'BUS'], ['get', 'id']]}
                     />
@@ -251,3 +244,30 @@ const localStyles = StyleSheet.create({
     //   zIndex: 100,
     // },
 });
+
+const markerStyles = {
+    marker: {
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+    },
+    bigMarker: {
+        iconSize: 0.2,
+        textField: ['get', 'line'],
+        textFont: ['Noto Sans Regular'],
+        textColor: '#fff',
+        textSize: 14,
+
+        // TODO: fix text overlap (while also not hiding overlapping markers)
+        textAllowOverlap: true,
+        textIgnorePlacement: true,
+    },
+    smallMarker: {
+        iconSize: 0.05,
+    },
+    tramIcon: {
+        iconImage: tramIconSmall,
+    },
+    busIcon: {
+        iconImage: busIconSmall,
+    },
+};
