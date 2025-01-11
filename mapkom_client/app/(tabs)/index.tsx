@@ -18,10 +18,6 @@ import iconBusPointer from '@/assets/images/iconBusPointer.png';
 import iconBusSmall from '@/assets/images/iconBusSmall.png';
 import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
-import {
-    FormattedString,
-    Value,
-} from '@maplibre/maplibre-react-native/lib/typescript/commonjs/src/types/MapLibreRNStyles';
 
 const mapStyles = {
     light: lightStyle,
