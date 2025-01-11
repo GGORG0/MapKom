@@ -59,7 +59,7 @@ export default function Index() {
                 {
                     id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
                     vehicle,
-                    line: vehicle.line.number || '?',
+                    line: vehicle.line.number,
                 },
             ),
         );
@@ -111,6 +111,8 @@ export default function Index() {
                     </>
                 )}
 
+                {/* TODO: use a vector marker */}
+                {/* TODO: animate the markers */}
                 <MapLibreGL.ShapeSource
                     id="markerSource"
                     onPress={({ features }) => {
@@ -137,6 +139,7 @@ export default function Index() {
                             textField: ['get', 'line'],
                             textFont: ['Noto Sans Regular'],
                             textColor: '#fff',
+                            textSize: 14,
                         }}
                         filter={
                             selectedMarker
@@ -170,7 +173,7 @@ export default function Index() {
                     {/* BUSES */}
                     <MapLibreGL.SymbolLayer
                         id="busMarkers"
-                        minZoomLevel={selectedMarker ? 1 : 13}
+                        minZoomLevel={13}
                         style={{
                             iconImage: busIconSmall,
                             iconAllowOverlap: true,
@@ -178,6 +181,7 @@ export default function Index() {
                             textField: ['get', 'line'],
                             textFont: ['Noto Sans Regular'],
                             textColor: '#fff',
+                            textSize: 14,
                         }}
                         filter={
                             selectedMarker

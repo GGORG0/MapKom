@@ -113,23 +113,20 @@ impl OpenDataSource {
                             s => Some(s.to_string()),
                         },
                         direction: None,
+
                         brigade: match record.brigade_combined.as_str().trim() {
                             "" | "None" | "-" => None,
                             s if s.len() == 1 => s.parse().ok(),
                             s => s.chars().rev().take(2).collect::<String>().parse().ok(),
                         },
+                        course_id: None,
+
                         vehicle_type: Some(Wroclaw::vehicle_type(record.fleet_number)),
                     },
 
-                    course_id: None,
-                    delay: None,
-
-                    current_stop: None,
-                    next_stop: None,
-
                     position: Point::new(record.lat, record.lng),
 
-                    direction: None,
+                    heading: None,
 
                     updated_at: Some(NaiveDateTime::parse_from_str(&record.updated_at, "%Y-%m-%d %H:%M:%S%.6f")?
                         .and_local_timezone(Warsaw)
@@ -140,6 +137,7 @@ impl OpenDataSource {
             })
             .collect::<Result<Vec<VehicleLocation>>>()?
             .into_iter()
+            .filter(|x| x.line.number.is_some())
             .filter(|x| x.fleet_number.is_some())
             .filter(|x| x.fleet_number.expect("fleet_number is None") >= 1000)
             .filter(|x| Wroclaw::sanitize_coordinates(&x.position))

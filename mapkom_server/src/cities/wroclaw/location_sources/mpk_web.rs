@@ -54,7 +54,7 @@ impl LocationSource for MpkWebApiSource {
 
             cache: Vec::new(),
             last_updated_at: DateTime::from_timestamp_nanos(0),
-        }) 
+        })
     }
 
     #[instrument(name = "mpk_web_refresh", skip(self), level = "debug")]
@@ -103,6 +103,7 @@ impl MpkWebApiSource {
                             number: Some(line),
                             direction: None,
                             brigade: None,
+                            course_id: None,
                             vehicle_type: Some(vehicle_type.clone()),
                         })
                     })
@@ -150,20 +151,20 @@ impl MpkWebApiSource {
                     line: Line {
                         number: Some(item.name),
                         direction: None,
+
                         brigade: None,
+                        course_id: Some(item.course),
+
                         vehicle_type: Some(item.vehicle_type),
                     },
-                    course_id: Some(item.course),
-                    delay: None,
-                    current_stop: None,
-                    next_stop: None,
                     position: Point::new(item.lat, item.lng),
-                    direction: None,
+                    heading: None,
                     updated_at: None,
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?
             .into_iter()
+            .filter(|x| x.line.number.is_some())
             .filter(|x| Wroclaw::sanitize_coordinates(&x.position))
             .collect())
     }

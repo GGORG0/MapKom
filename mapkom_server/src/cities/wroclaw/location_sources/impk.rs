@@ -7,7 +7,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use chrono_tz::Europe::Warsaw;
 use color_eyre::{Result, eyre::ContextCompat};
 use diqwest::WithDigestAuth;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use tracing::instrument;
 
 // API extracted from https://play.google.com/store/apps/details?id=pl.wasko.android.mpk
@@ -33,7 +33,7 @@ struct ImpkApiResponse {
     #[serde(rename = "l")]
     line: String,
 
-    #[serde(rename = "t")]
+    #[serde(rename = "t", deserialize_with = "deserialize_vehicle_type")]
     vehicle_type: VehicleType,
 
     #[serde(rename = "s")]
@@ -73,7 +73,15 @@ impl LocationSource for ImpkApiSource {
     }
 
     fn query(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
-        (self.last_updated_at, &self.cache)
+        static EMPTY_VEC: Vec<VehicleLocation> = Vec::new();
+        (
+            self.last_updated_at,
+            if self.last_updated_at > Utc::now() - chrono::Duration::minutes(5) {
+                &self.cache
+            } else {
+                &EMPTY_VEC
+            },
+        )
     }
 
     fn query_all(&self) -> (DateTime<Utc>, &Vec<VehicleLocation>) {
@@ -104,9 +112,9 @@ impl ImpkApiSource {
         .context("Local timezone conversion failed")?
         .to_utc();
 
-        let vehicles: Vec<ImpkApiResponse> = serde_json::from_value(serde_json::Value::Array(
-            values.into_iter().skip(1).collect(),
-        ))?;
+        let vehicles = values.into_iter().skip(1).collect();
+
+        let vehicles: Vec<ImpkApiResponse> = serde_json::from_value(vehicles)?;
 
         let locations = vehicles
             .into_iter()
@@ -117,25 +125,37 @@ impl ImpkApiSource {
                     line: Line {
                         number: Some(item.line),
                         direction: None,
+
                         brigade: None,
+                        course_id: Some(item.course),
+
                         vehicle_type: Some(item.vehicle_type),
                     },
-                    course_id: Some(item.course),
-                    delay: Some(item.delay),
-                    current_stop: Some(item.symbol.parse()?),
-                    next_stop: Some(item.direction.parse()?),
                     position: Point::new(item.lat, item.lng),
-                    direction: None,
+                    heading: None,
                     updated_at: Some(date),
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?
             .into_iter()
+            .filter(|x| x.line.number.is_some())
             .filter(|x| x.fleet_number.is_some())
             .filter(|x| x.fleet_number.expect("fleet_number is None") >= 1000)
             .filter(|x| Wroclaw::sanitize_coordinates(&x.position))
             .collect();
 
         Ok((date, locations))
+    }
+}
+
+fn deserialize_vehicle_type<'de, D>(deserializer: D) -> std::result::Result<VehicleType, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    match s.as_str() {
+        "t" => Ok(VehicleType::Tram),
+        "b" => Ok(VehicleType::Bus),
+        _ => Err(serde::de::Error::custom("Unknown vehicle type")),
     }
 }

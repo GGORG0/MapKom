@@ -74,7 +74,10 @@ impl<'de> Deserialize<'de> for VehicleType {
 pub struct Line {
     pub number: Option<String>,
     pub direction: Option<String>,
-    pub brigade: Option<i8>,
+
+    pub brigade: Option<u8>,
+    pub course_id: Option<u64>,
+
     pub vehicle_type: Option<VehicleType>,
 }
 
@@ -84,15 +87,8 @@ pub struct VehicleLocation {
     pub plate_number: Option<String>,
     pub line: Line,
 
-    pub course_id: Option<u64>,
-    pub delay: Option<i64>,
-
-    pub current_stop: Option<u32>,
-    pub next_stop: Option<u32>,
-
     pub position: Point,
-
-    pub direction: Option<u16>,
+    pub heading: Option<u16>,
 
     pub updated_at: Option<DateTime<Utc>>,
 }

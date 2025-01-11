@@ -7,18 +7,12 @@ export interface VehicleLocation {
         number?: string;
         direction?: string;
         brigade?: number;
+        course_id: number;
         vehicle_type?: VehicleType;
     };
 
-    course_id?: number;
-    delay?: number;
-
-    current_stop?: number;
-    next_stop?: number;
-
     position: Point;
-
-    direction?: number;
+    heading?: number;
 
     updated_at?: string;
 }
