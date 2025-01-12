@@ -104,10 +104,10 @@ If you use VSCode, you can open the `mapkom.code-workspace` workspace for ease o
    - Android
      - [Physical device](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=physical&mode=development-build&buildEnv=local)
      - [Emulator](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated&mode=development-build&buildEnv=local)
-1. Clone the repo and go into the `mapkom_server` directory.
+1. Clone the repo and go into the `mapkom_client` directory.
    ```sh
    git clone https://github.com/GGORG0/MapKom.git
-   cd mapkom_server/
+   cd mapkom_client/
    ```
 2. Install npm dependencies
    ```sh
