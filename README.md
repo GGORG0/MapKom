@@ -9,7 +9,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/GGORG0/MapKom">
-    <img src="assets/logo-text.svg" alt="Logo" width="640" height="160">
+    <img src="https://github.com/GGORG0/MapKom/raw/refs/heads/master/assets/logo-text.svg" alt="Logo" width="640" height="160">
   </a>
 
 <h3 align="center">MapKom</h3>
@@ -18,9 +18,13 @@
     Public transport on a map
     <br />
     <br />
-    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=bug&template=bug-report.md&title=%5BBUG%5D%3A+">Report Bug</a>
     &middot;
-    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=city+bug&template=city-bug.md&title=%5BCB%5D%3A+">Report City Bug</a>
+    &middot;
+    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request.md&title=%5BFR%5D%3A+">Request Feature</a>
+    &middot;
+    <a href="https://github.com/GGORG0/MapKom/issues/new?labels=city+request&template=city-request.md&title=%5BCR%5D%3A+">Request City</a>
   </p>
 </div>
 
@@ -50,7 +54,7 @@ Stay tuned for updates!
 - ~~📍 Location marker **filtering** by line and vehicle model for a clearer map view~~
 - ~~🚍️ Explore vehicle **information, specs and photos**~~
 - ~~🔎 Vehicle, line and stop **search**~~
-- [💬 More?](https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request.md)
+- [💬 More?](https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request.md&title=%5BFR%5D%3A+)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -134,7 +138,7 @@ If you use VSCode, you can open the `mapkom.code-workspace` workspace for ease o
 
 Any contributions you make, like a small feature addition, support for a new city or new translations, would be greatly appreciated.
 
-If you have any suggestions you'd like to see implemented, please make a [feature request](https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request---.md).
+If you have any suggestions you'd like to see implemented, please make a [feature request](https://github.com/GGORG0/MapKom/issues/new?labels=enhancement&template=feature-request.md&title=%5BFR%5D%3A+).
 
 Don't forget to give the project a star if you enjoyed it. Thanks!
 
