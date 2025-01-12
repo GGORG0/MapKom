@@ -45,7 +45,7 @@ Stay tuned for updates!
 - 🦀 Blazingly **fast backend**, written in Rust
 - 🧩 An **extensible and modular** design, allowing for easy addition of new cities
 - 🛰️ **Real-time location and heading markers** for public transport vehicles, updated every **5 seconds** and streamed to you **instantly**
-- 📡 **Redundant location sources** to ensure reliability, because Wrocław is known for breaking one while leaving the others working
+- 🛡️ **Redundant location sources** to ensure reliability, because Wrocław is known for breaking one while leaving the others working
 - ~~🧭 **Routing** between stops, with **transfer support** and **live updates** along your journey~~
 - ~~📈 **Live route view** for each vehicle~~
 - ~~🕑 Vehicle **delay calculation** and stop **arrival time prediction**~~
