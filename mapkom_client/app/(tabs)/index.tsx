@@ -125,9 +125,7 @@ export default function Index() {
                     }}
                 />
 
-                {/* TODO: use a vector marker */}
                 {/* TODO: animate the markers */}
-                {/* TODO: fix markers clumping up even though i set iconAllowOverlap */}
                 <MapLibreGL.ShapeSource
                     id="markerSource"
                     onPress={({ features }) => {
