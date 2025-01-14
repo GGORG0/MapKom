@@ -4,7 +4,7 @@
         "slug": "mapkom",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/images/icon.png",
+        "icon": "./assets/logos/logo-background.png",
         "scheme": "mapkom",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": false,
@@ -14,31 +14,36 @@
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
+                "foregroundImage": "./assets/logos/logo-transparent-light-small.png",
+                "monochromeImage": "./assets/logos/logo-transparent-small.png",
+                "backgroundColor": "#1b5e20"
             },
             "package": "xyz.ggorg.mapkom"
         },
         "web": {
             "bundler": "metro",
             "output": "static",
-            "favicon": "./assets/images/favicon.png"
+            "favicon": "./assets/logos/logo-circle.png"
         },
         "plugins": [
             "expo-router",
             [
                 "expo-splash-screen",
                 {
-                    "image": "./assets/images/splash-icon.png",
+                    "image": "./assets/logos/logo-transparent-light.png",
                     "imageWidth": 200,
-                    "resizeMode": "contain"
+                    "resizeMode": "contain",
+                    "backgroundColor": "#1b5e20"
                 }
             ],
             "expo-font",
             [
                 "react-native-localization-settings",
                 {
-                    "languages": ["en", "pl"]
+                    "languages": [
+                        "en",
+                        "pl"
+                    ]
                 }
             ],
             "@maplibre/maplibre-react-native",

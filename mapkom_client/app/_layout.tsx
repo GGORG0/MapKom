@@ -32,6 +32,12 @@ import { SystemBars } from 'react-native-edge-to-edge';
 import { BackendUrlProvider } from '@/lib/providers/BackendUrlProvider';
 import { SnackbarToastProvider } from '@/lib/providers/SnackbarToastProvider';
 
+SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({
+    duration: 1000,
+    fade: true,
+});
+
 const languageDetector = createLanguageDetector({});
 
 i18n.use(languageDetector)
