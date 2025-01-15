@@ -91,7 +91,11 @@ impl WroclawLocationSources {
             if let Some(previous) = previous.iter().find(|l| l.fleet_number == loc.fleet_number) {
                 if previous.position != loc.position {
                     loc.real_updated_at = Some(updated_at);
-                    loc.heading = Some(previous.position.angle_to(&loc.position));
+                    if loc.position.distance_to(&previous.position) >= 3.0 {
+                        loc.heading = Some(previous.position.angle_to(&loc.position));
+                    } else {
+                        loc.heading = previous.heading;
+                    }
                 } else {
                     loc.real_updated_at = previous.real_updated_at;
                     loc.heading = previous.heading;

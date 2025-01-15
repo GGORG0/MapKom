@@ -13,8 +13,22 @@ pub mod point {
             Self { lat, lng }
         }
 
-        pub fn distance(&self, other: &Self) -> f64 {
-            ((self.lat - other.lat).powi(2) + (self.lng - other.lng).powi(2)).sqrt()
+        pub fn distance_to(&self, other: &Point) -> f64 {
+            const EARTH_RADIUS_METERS: f64 = 6371e3;
+
+            let lat1 = self.lat.to_radians();
+            let lng1 = self.lng.to_radians();
+            let lat2 = other.lat.to_radians();
+            let lng2 = other.lng.to_radians();
+
+            let dlat = lat2 - lat1;
+            let dlng = lng2 - lng1;
+
+            let a =
+                (dlat / 2.0).sin().powi(2) + lat1.cos() * lat2.cos() * (dlng / 2.0).sin().powi(2);
+            let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
+
+            EARTH_RADIUS_METERS * c
         }
 
         pub fn in_area(&self, area: &Area) -> bool {
@@ -26,25 +40,15 @@ pub mod point {
         }
 
         pub fn angle_to(&self, other: &Self) -> f64 {
-            use std::f64::consts::PI;
-
-            fn to_radians(deg: f64) -> f64 {
-                deg * PI / 180.0
-            }
-
-            fn to_degrees(rad: f64) -> f64 {
-                rad * 180.0 / PI
-            }
-
-            let phi1 = to_radians(self.lat);
-            let phi2 = to_radians(other.lat);
-            let delta_lambda = to_radians(other.lng - self.lng);
+            let phi1 = (self.lat).to_radians();
+            let phi2 = (other.lat).to_radians();
+            let delta_lambda = (other.lng - self.lng).to_radians();
 
             let y = delta_lambda.sin() * phi2.cos();
             let x = phi1.cos() * phi2.sin() - phi1.sin() * phi2.cos() * delta_lambda.cos();
             let theta = y.atan2(x);
 
-            (to_degrees(theta) + 360.0) % 360.0
+            ((theta).to_degrees() + 360.0) % 360.0
         }
     }
 
