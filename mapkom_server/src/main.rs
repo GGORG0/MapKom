@@ -14,8 +14,7 @@ use color_eyre::{Result, config::HookBuilder};
 use futures::future::join_all;
 use once_cell::sync::Lazy;
 use reqwest::Client;
-use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{debug, level_filters::LevelFilter};
+use tracing::level_filters::LevelFilter;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
     fmt::format::FmtSpan, layer::SubscriberExt as _, util::SubscriberInitExt,
@@ -36,8 +35,6 @@ async fn main() -> Result<()> {
     init_eyre()?;
     init_tracing()?;
 
-    let scheduler = init_scheduler().await?;
-
     let cities = vec![cities::wroclaw::Wroclaw::new().await?];
 
     let (cities, jobs): (Vec<_>, Vec<_>) = cities.into_iter().unzip();
@@ -52,29 +49,9 @@ async fn main() -> Result<()> {
 
     let (start, io) = api::main(cities).await?;
 
-    let jobs = jobs
-        .into_iter()
-        .flat_map(|f| f(io.clone()))
-        .collect::<Vec<Job>>();
-
     for job in jobs {
-        job.on_start_notification_add(
-            &scheduler,
-            Box::new(|job_id, notification_id, notification_type| {
-                Box::pin(async move {
-                    debug!(
-                        "Job {:?} started with notification {:?} of type {:?}",
-                        job_id, notification_id, notification_type
-                    );
-                })
-            }),
-        )
-        .await?;
-
-        scheduler.add(job).await?;
+        job(io.clone());
     }
-
-    scheduler.start().await?;
 
     start.await?;
 
@@ -114,9 +91,4 @@ fn init_tracing() -> Result<()> {
         .try_init()?;
 
     Ok(())
-}
-
-async fn init_scheduler() -> Result<JobScheduler> {
-    let scheduler = JobScheduler::new().await?;
-    Ok(scheduler)
 }

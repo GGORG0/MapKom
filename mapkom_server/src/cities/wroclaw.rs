@@ -10,9 +10,12 @@ use color_eyre::Result;
 use gtfs::WroclawGtfs;
 use location_sources::WroclawLocationSources;
 use socketioxide::SocketIo;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use tokio_cron_scheduler::Job;
+use std::{pin::Pin, sync::Arc, time::Duration};
+use tokio::{
+    sync::RwLock,
+    task::JoinHandle,
+    time::{MissedTickBehavior, interval},
+};
 use tracing::error;
 
 pub struct Wroclaw {
@@ -36,7 +39,7 @@ impl Wroclaw {
 }
 
 impl City for Wroclaw {
-    async fn new() -> Result<(Arc<RwLock<Self>>, impl Fn(SocketIo) -> Vec<Job>)>
+    async fn new() -> Result<(Arc<RwLock<Self>>, impl Fn(SocketIo) -> Vec<JoinHandle<()>>)>
     where
         Self: Sized,
     {
@@ -49,43 +52,54 @@ impl City for Wroclaw {
 
         let jobs = {
             let s = s.clone();
+
             move |io: SocketIo| {
+                #[allow(clippy::unused_unit, unreachable_code)]
                 vec![
                     {
                         let s = s.clone();
-                        Job::new_async("every 5 seconds", move |_, _| {
-                            let s = s.clone();
-                            let io = io.clone();
-                            Box::pin(async move {
+                        let io = io.clone();
+                        Box::pin(async move {
+                            let mut timer = interval(Duration::from_secs(5));
+                            timer.set_missed_tick_behavior(MissedTickBehavior::Skip);
+                            loop {
+                                timer.tick().await;
+
                                 let mut s = s.write().await;
                                 if let Err(e) = s.refresh_locations().await {
                                     error!(error = ?e.wrap_err("Error while refreshing locations"));
-                                    return;
+                                    continue;
                                 }
                                 send_vehicle_locations_to_all(
-                                    io,
+                                    io.clone(),
                                     Self::slug(),
                                     s.vehicle_locations(),
                                 )
                                 .await;
-                            })
-                        })
-                        .expect("Failed to create location refresh job")
+                            }
+                            ()
+                        }) as Pin<Box<dyn Future<Output = ()> + Send>>
                     },
                     {
                         let s = s.clone();
-                        Job::new_async("every 30 minutes", move |_, _| {
-                            let s = s.clone();
-                            Box::pin(async move {
+                        Box::pin(async move {
+                            let mut timer = interval(Duration::from_secs(30 * 60));
+                            timer.set_missed_tick_behavior(MissedTickBehavior::Skip);
+                            loop {
+                                timer.tick().await;
+
                                 let mut s = s.write().await;
                                 if let Err(e) = s.refresh_gtfs().await {
                                     error!(error = ?e.wrap_err("Error while refreshing GTFS"));
                                 }
-                            })
-                        })
-                        .expect("Failed to create GTFS refresh job")
+                            }
+                            ()
+                        }) as Pin<Box<dyn Future<Output = ()> + Send>>
                     },
                 ]
+                .into_iter()
+                .map(|f| tokio::spawn(f))
+                .collect()
             }
         };
 

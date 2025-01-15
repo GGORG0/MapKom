@@ -11,8 +11,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use socketioxide::SocketIo;
 use std::{collections::HashMap, io::Cursor, str::FromStr, sync::Arc};
 use strum::{AsRefStr, EnumIter, EnumString};
-use tokio::sync::RwLock;
-use tokio_cron_scheduler::Job;
+use tokio::{sync::RwLock, task::JoinHandle};
 use tracing::{instrument, warn};
 use zip::ZipArchive;
 
@@ -22,7 +21,7 @@ use crate::{
 };
 
 pub(crate) trait City {
-    async fn new() -> Result<(Arc<RwLock<Self>>, impl Fn(SocketIo) -> Vec<Job>)>
+    async fn new() -> Result<(Arc<RwLock<Self>>, impl Fn(SocketIo) -> Vec<JoinHandle<()>>)>
     where
         Self: Sized;
 
