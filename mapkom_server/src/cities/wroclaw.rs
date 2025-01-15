@@ -10,11 +10,11 @@ use color_eyre::Result;
 use gtfs::WroclawGtfs;
 use location_sources::WroclawLocationSources;
 use socketioxide::SocketIo;
-use std::{pin::Pin, sync::Arc, time::Duration};
+use std::{future::Future, pin::Pin, sync::Arc, time::Duration};
 use tokio::{
     sync::RwLock,
     task::JoinHandle,
-    time::{MissedTickBehavior, interval},
+    time::{interval, MissedTickBehavior},
 };
 use tracing::error;
 
