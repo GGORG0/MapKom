@@ -4,6 +4,7 @@ import { registerDevMenuItems } from 'expo-dev-menu';
 import { NativeModules } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { useSnackbarToast } from './SnackbarToastProvider';
+import axios from 'axios';
 
 interface BackendUrlContextData {
     url: string;
@@ -35,7 +36,7 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
                       return `${url.protocol}//${url.hostname}:8080`;
                   }) as () => string
               )()
-            : process.env.EXPO_PUBLIC_API_URL || '',
+            : process.env.EXPO_PUBLIC_API_URL || 'https://mapkom-api.ggorg.xyz',
     );
 
     // TODO: handle more than 1 city + remember the last city + detect city by location + add city selection menu
@@ -69,8 +70,8 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
                 ],
             },
         });
-        setUrl((prev) => (result ? result[0] : prev));
-        setAuth((prev: any) => (result ? JSON.parse(result[1]) : prev));
+        setUrl(result ? result[0] : 'https://mapkom-api.ggorg.xyz');
+        setAuth(result ? JSON.parse(result[1]) : { city: 'wroclaw' });
         // hacky, but who cares
         setTimeout(() => {
             SheetManager.hide('error-sheet');
@@ -111,6 +112,7 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
                 auth,
                 setAuth,
             }}>
+            {__DEV__ && <BackendFixer />}
             {children}
         </BackendUrlContext.Provider>
     );
@@ -118,4 +120,29 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
 
 export function useBackendUrl() {
     return useContext(BackendUrlContext);
+}
+
+function BackendFixer() {
+    const { url, setUrl } = useBackendUrl();
+
+    const showToast = useSnackbarToast();
+
+    useEffect(() => {
+        axios.get(url).catch((e) => {
+            setUrl(
+                process.env.EXPO_PUBLIC_API_URL ||
+                    'https://mapkom-api.ggorg.xyz',
+            );
+
+            console.warn(`Backend URL fixed! (${e})`);
+
+            showToast({
+                message: `Backend URL fixed!`,
+                duration: 1000,
+                showCloseIcon: true,
+            });
+        });
+    }, [url, setUrl, showToast]);
+
+    return null;
 }

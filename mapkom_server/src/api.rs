@@ -2,7 +2,7 @@ pub mod health;
 pub mod stats;
 
 use crate::{cities::CityMap, socketio};
-use axum::{Router, serve::Serve};
+use axum::{Router, response::Redirect, serve::Serve};
 use color_eyre::Result;
 use socketioxide::SocketIo;
 use tokio::net::TcpListener;
@@ -32,6 +32,11 @@ pub async fn main(city_map: CityMap) -> Result<(Serve<Router, Router>, SocketIo)
     let router =
         router.merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api.clone()));
     let router = router.merge(Scalar::with_url("/scalar", api));
+
+    let router = router.merge(Router::new().route(
+        "/",
+        axum::routing::get(|| async { Redirect::temporary("/scalar") }),
+    ));
 
     let (socketio_layer, io) = socketio::init(city_map);
     let router = router.merge(
