@@ -1,5 +1,9 @@
 {
     "aboutPage": {
+        "build": "",
+        "credits": "Stworzone przez GGORG i opublikowane na licencji GPLv3",
+        "githubButton": "Zobacz kod źródłowy na GitHubie",
+        "subtitle": "Komunikacja miejska na mapie",
         "title": "Strona informacyjna"
     },
     "confirmationSheet": {

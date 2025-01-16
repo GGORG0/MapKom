@@ -45,37 +45,7 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
     });
 
     const showChangeSheet = useCallback(async () => {
-        const result = await SheetManager.show('text-input-sheet', {
-            payload: {
-                title: 'Change backend URL',
-                fields: [
-                    {
-                        label: 'URL',
-                        placeholder: 'https://mapkom-api.ggorg.xyz',
-                        initialValue: url,
-                    },
-                    {
-                        label: 'Auth (JSON)',
-                        placeholder: '{"city":"wroclaw"}',
-                        initialValue: JSON.stringify(auth),
-                        validator: (value) => {
-                            try {
-                                JSON.parse(value);
-                                return true;
-                            } catch {
-                                return false;
-                            }
-                        },
-                    },
-                ],
-            },
-        });
-        setUrl(result ? result[0] : 'https://mapkom-api.ggorg.xyz');
-        setAuth(result ? JSON.parse(result[1]) : { city: 'wroclaw' });
-        // hacky, but who cares
-        setTimeout(() => {
-            SheetManager.hide('error-sheet');
-        }, 500);
+        await showUrlChangeSheet({ url, setUrl, auth, setAuth });
     }, [url, auth]);
 
     const showToast = useSnackbarToast();
@@ -145,4 +115,39 @@ function BackendFixer() {
     }, [url, setUrl, showToast]);
 
     return null;
+}
+
+export async function showUrlChangeSheet(ctx: BackendUrlContextData) {
+    const result = await SheetManager.show('text-input-sheet', {
+        payload: {
+            title: 'Change backend URL',
+            fields: [
+                {
+                    label: 'URL',
+                    placeholder: 'https://mapkom-api.ggorg.xyz',
+                    initialValue: ctx.url,
+                },
+                {
+                    label: 'Auth (JSON)',
+                    placeholder: '{"city":"wroclaw"}',
+                    initialValue: JSON.stringify(ctx.auth),
+                    validator: (value) => {
+                        try {
+                            JSON.parse(value);
+                            return true;
+                        } catch {
+                            return false;
+                        }
+                    },
+                },
+            ],
+        },
+    });
+    if (!result) return;
+    ctx.setUrl(result[0] || 'https://mapkom-api.ggorg.xyz');
+    ctx.setAuth(JSON.parse(result[1]) || { city: 'wroclaw' });
+    // hacky, but who cares
+    setTimeout(() => {
+        SheetManager.hide('error-sheet');
+    }, 500);
 }

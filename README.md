@@ -9,7 +9,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/GGORG0/MapKom">
-    <img src="https://github.com/GGORG0/MapKom/raw/refs/heads/master/assets/logo-text.svg" alt="Logo" width="640" height="160">
+    <img src="https://github.com/GGORG0/MapKom/raw/refs/heads/master/mapkom_client/assets/logos/logo-text.svg" alt="Logo" width="640" height="160">
   </a>
 
 <h3 align="center">MapKom</h3>

@@ -1,6 +1,10 @@
 {
     "aboutPage": {
-        "title": "About page"
+        "build": "build",
+        "credits": "Made by GGORG and published under the GPLv3",
+        "githubButton": "See the source code on GitHub",
+        "subtitle": "Public transport on a map",
+        "title": "MapKom"
     },
     "confirmationSheet": {
         "cancel": "Cancel",
