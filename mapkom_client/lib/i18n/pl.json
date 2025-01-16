@@ -1,10 +1,10 @@
 {
     "aboutPage": {
-        "build": "",
-        "credits": "Stworzone przez GGORG i opublikowane na licencji GPLv3",
+        "build": "kompilacja",
+        "credits": "Stworzony przez GGORG i opublikowany na licencji GPLv3",
         "githubButton": "Zobacz kod źródłowy na GitHubie",
         "subtitle": "Komunikacja miejska na mapie",
-        "title": "Strona informacyjna"
+        "title": "MapKom"
     },
     "confirmationSheet": {
         "cancel": "Anuluj",
