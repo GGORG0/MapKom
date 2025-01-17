@@ -1,12 +1,12 @@
 use crate::{
-    HTTP_CLIENT,
-    cities::{City as _, Line, LocationSource, VehicleLocation, VehicleType, wroclaw::Wroclaw},
+    cities::{wroclaw::Wroclaw, City as _, Line, LocationSource, VehicleLocation, VehicleType},
     geometry::point::Point,
+    HTTP_CLIENT,
 };
 use chrono::{DateTime, Utc};
 use color_eyre::{
+    eyre::{format_err, ContextCompat},
     Result,
-    eyre::{ContextCompat, format_err},
 };
 use scraper::{Html, Selector};
 use serde::Deserialize;
@@ -79,7 +79,7 @@ impl LocationSource for MpkWebApiSource {
 impl MpkWebApiSource {
     #[instrument(name = "mpk_web_fetch_lines")]
     async fn fetch_lines() -> Result<Vec<Line>> {
-        let response = reqwest::get(SCRAPE_URL).await?.text().await?;
+        let response = HTTP_CLIENT.get(SCRAPE_URL).send().await?.text().await?;
         let html = Html::parse_document(response.as_str());
 
         Ok(VehicleType::iter()
@@ -160,7 +160,7 @@ impl MpkWebApiSource {
                     position: Point::new(item.lat, item.lng),
                     heading: None,
                     updated_at: None,
-                    real_updated_at: None
+                    real_updated_at: None,
                 })
             })
             .collect::<Result<Vec<VehicleLocation>>>()?

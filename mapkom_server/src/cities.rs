@@ -3,10 +3,11 @@ pub mod wroclaw;
 use axum::body::Bytes;
 use chrono::{DateTime, TimeZone, Utc};
 use color_eyre::{
+    eyre::{eyre, Context as _, ContextCompat as _},
     Result,
-    eyre::{Context as _, ContextCompat as _},
 };
 use deunicode::deunicode;
+use reqwest::IntoUrl;
 use serde::{Deserialize, Deserializer, Serialize};
 use socketioxide::SocketIo;
 use std::{collections::HashMap, io::Cursor, str::FromStr, sync::Arc};
@@ -16,8 +17,8 @@ use tracing::{instrument, warn};
 use zip::ZipArchive;
 
 use crate::{
-    HTTP_CLIENT,
     geometry::{area::Area, point::Point},
+    HTTP_CLIENT,
 };
 
 pub(crate) trait City {
@@ -132,18 +133,31 @@ pub(crate) trait GtfsArchive<T: City>:
     where
         Self: Sized;
 
-    fn url() -> &'static str;
+    async fn download() -> Result<ZipArchive<Cursor<Bytes>>>;
 
-    #[instrument(name = "gtfs_download")]
-    async fn download() -> Result<ZipArchive<Cursor<Bytes>>> {
-        let response = HTTP_CLIENT.get(Self::url()).send().await?;
+    fn coverage_start(&self) -> Option<DateTime<Utc>>;
+    fn coverage_end(&self) -> Option<DateTime<Utc>>;
+    fn needs_update(&self) -> bool {
+        let now = Utc::now();
 
-        let data = response.bytes().await?;
-        Ok(zip::ZipArchive::new(Cursor::new(data))?)
+        if let Some(end_date) = self.coverage_end() {
+            if now > end_date {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+        if let Some(start_date) = self.coverage_start() {
+            if now < start_date {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+        false
     }
-
-    async fn needs_update(last_updated: DateTime<Utc>) -> Result<bool>;
-    fn last_updated(&self) -> DateTime<Utc>;
 
     #[instrument(name = "gtfs_save_cache", skip(self))]
     async fn save_cache(&self) -> Result<()> {
@@ -158,7 +172,19 @@ pub(crate) trait GtfsArchive<T: City>:
         async_fs::write(filename, bincode::serialize(self)?).await?;
 
         let filename_meta = cache_dir.join(format!("gtfs_{}.txt", T::slug()));
-        async_fs::write(filename_meta, self.last_updated().timestamp().to_string()).await?;
+        async_fs::write(
+            filename_meta,
+            format!(
+                "{} {}",
+                self.coverage_start()
+                    .context(eyre!("Couldn't get GTFS coverage start time"))?
+                    .timestamp(),
+                self.coverage_end()
+                    .context(eyre!("Couldn't get GTFS coverage end time"))?
+                    .timestamp()
+            ),
+        )
+        .await?;
 
         Ok(())
     }
@@ -178,15 +204,25 @@ pub(crate) trait GtfsArchive<T: City>:
             return Self::new().await;
         }
 
-        let last_updated = {
+        let (coverage_start, coverage_end) = {
             let data = async_fs::read_to_string(timestamp_filename).await?;
+            let (start, end) = data
+                .split_once(' ')
+                .context("Failed to parse coverage times")?;
 
-            Utc.timestamp_opt(data.parse()?, 0)
-                .single()
-                .context("Failed to parse last updated time")?
+            (
+                Utc.timestamp_opt(start.parse()?, 0)
+                    .single()
+                    .context("Failed to parse coverage start time")?,
+                Utc.timestamp_opt(end.parse()?, 0)
+                    .single()
+                    .context("Failed to parse coverage end time")?,
+            )
         };
 
-        if Self::needs_update(last_updated).await? {
+        let now = Utc::now();
+
+        if now > coverage_end || now < coverage_start {
             warn!(
                 "GTFS cache for {} is outdated, downloading fresh data",
                 T::name()
@@ -203,4 +239,13 @@ pub(crate) trait GtfsArchive<T: City>:
             })?
         })
     }
+}
+
+async fn download_zip<U>(url: U) -> Result<ZipArchive<Cursor<Bytes>>>
+where
+    U: IntoUrl,
+{
+    let response = HTTP_CLIENT.get(url).send().await?;
+    let data = response.bytes().await?;
+    Ok(zip::ZipArchive::new(Cursor::new(data))?)
 }

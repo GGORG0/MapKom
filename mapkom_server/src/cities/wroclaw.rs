@@ -25,7 +25,7 @@ pub struct Wroclaw {
 
 impl Wroclaw {
     async fn refresh_gtfs(&mut self) -> Result<bool> {
-        if gtfs::WroclawGtfs::needs_update(self.gtfs.last_updated()).await? {
+        if self.gtfs.needs_update() {
             self.gtfs = WroclawGtfs::new().await?;
             Ok(true)
         } else {

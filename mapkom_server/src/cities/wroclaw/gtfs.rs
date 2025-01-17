@@ -13,24 +13,26 @@ pub mod variants;
 pub mod vehicle_types;
 
 use crate::{
-    HTTP_CLIENT,
     cities::{GtfsArchive, GtfsFile},
+    HTTP_CLIENT,
 };
-use chrono::{DateTime, NaiveDate, NaiveTime, Utc, format::ParseErrorKind, serde::ts_seconds};
+use axum::body::Bytes;
+use chrono::{format::ParseErrorKind, DateTime, NaiveDate, NaiveTime, Utc};
+use chrono_tz::Europe::Warsaw;
 use color_eyre::{
-    Result,
     eyre::{eyre, format_err},
+    Result,
 };
-use serde::{Deserialize, Deserializer, Serialize, de};
-use tracing::{instrument, warn};
+use scraper::{Html, Selector};
+use serde::{de, Deserialize, Deserializer, Serialize};
+use std::io::Cursor;
+use tracing::{info, instrument};
+use zip::ZipArchive;
 
 use super::Wroclaw;
 
 #[derive(Serialize, Deserialize)]
 pub struct WroclawGtfs {
-    #[serde(with = "ts_seconds")]
-    last_updated: DateTime<Utc>,
-
     pub agencies: Vec<agencies::WroclawAgency>,
     pub calendar: Vec<calendar::WroclawCalendar>,
     pub calendar_dates: Vec<calendar_dates::WroclawCalendarDate>,
@@ -47,29 +49,29 @@ pub struct WroclawGtfs {
 }
 
 impl WroclawGtfs {
-    async fn scrape_last_updated() -> Result<DateTime<Utc>> {
-        let response = HTTP_CLIENT
-            .get("https://www.wroclaw.pl/open-data/dataset/rozkladjazdytransportupublicznegoplik_data")
-            .send()
-            .await?
-            .text()
-            .await?;
+    #[instrument(name = "wroclaw_gtfs_dlc_archive", skip(url), fields(name = url.rsplit_once('/').expect("Invalid URL").1))]
+    async fn download_and_check_archive(url: String) -> Result<Option<ZipArchive<Cursor<Bytes>>>> {
+        let response = HTTP_CLIENT.get(&url).send().await?;
+        let bytes = response.bytes().await?;
+        let mut archive = ZipArchive::new(Cursor::new(bytes))?;
 
-        let html = scraper::Html::parse_document(response.as_str());
+        let services = calendar::WroclawCalendar::new(&mut archive)?;
 
-        let selector = scraper::Selector::parse(".dataset-info-table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > span:nth-child(1)")
-                .map_err(|x| format_err!("{}", x))?;
+        let now = Utc::now().with_timezone(&Warsaw).naive_local().date();
 
-        let last_updated = html
-            .select(&selector)
-            .next()
-            .ok_or_else(|| eyre!("Couldn't find last updated date"))?
-            .value()
-            .attr("data-datetime")
-            .ok_or_else(|| eyre!("Couldn't find last updated date"))?;
+        for service in services {
+            if service.start_date.0 <= now && service.end_date.0 >= now {
+                info!(
+                    url = &url,
+                    start = service.start_date.0.format("%Y-%m-%d").to_string(),
+                    end = service.end_date.0.format("%Y-%m-%d").to_string(),
+                    "Found GTFS file!"
+                );
+                return Ok::<_, color_eyre::Report>(Some(archive));
+            }
+        }
 
-        // they use a fucked up format (rfc3339 but without the colon in the timezone)
-        Ok(DateTime::parse_from_str(last_updated, "%Y-%m-%dT%H:%M:%S%z")?.to_utc())
+        Ok(None)
     }
 }
 
@@ -79,8 +81,6 @@ impl GtfsArchive<Wroclaw> for WroclawGtfs {
         let mut archive = Self::download().await?;
 
         let s = Self {
-            last_updated: Self::scrape_last_updated().await?,
-
             agencies: agencies::WroclawAgency::new(&mut archive)?,
             calendar: calendar::WroclawCalendar::new(&mut archive)?,
             calendar_dates: calendar_dates::WroclawCalendarDate::new(&mut archive)?,
@@ -101,26 +101,62 @@ impl GtfsArchive<Wroclaw> for WroclawGtfs {
         Ok(s)
     }
 
-    fn url() -> &'static str {
-        "https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/OtwartyWroclaw_rozklad_jazdy_GTFS.zip"
-    }
+    #[instrument(name = "wroclaw_gtfs_download")]
+    async fn download() -> Result<ZipArchive<Cursor<Bytes>>> {
+        const HISTORY_URL: &str = "https://www.wroclaw.pl/open-data/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/7d10d77f-bcf3-47b2-a608-613971c4f5f8";
 
-    async fn needs_update(last_updated: DateTime<Utc>) -> Result<bool> {
-        let scraped = Self::scrape_last_updated().await?;
-        if last_updated < scraped {
-            warn!(
-                last_updated = last_updated.to_rfc3339(),
-                scraped = scraped.to_rfc3339(),
-                message = "GTFS archive is outdated",
-            );
-            Ok(true)
-        } else {
-            Ok(false)
+        let urls = {
+            let response = HTTP_CLIENT.get(HISTORY_URL).send().await?.text().await?;
+            let html = Html::parse_document(response.as_str());
+
+            let selector = Selector::parse(
+                "li.resource-item > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)",
+            )
+            .map_err(|x| format_err!("{}", x))?;
+
+            html.select(&selector)
+                .map(|element| -> Result<_> {
+                    element
+                        .value()
+                        .attr("href")
+                        .map(|x| x.to_string())
+                        .ok_or_else(|| eyre!("Couldn't get link to GTFS file"))
+                })
+                .collect::<Result<Vec<_>>>()?
+        };
+
+        // TODO: use binary search
+        for url in urls {
+            if let Some(archive) = Self::download_and_check_archive(url).await? {
+                return Ok(archive);
+            }
         }
+
+        Err(eyre!("Couldn't find correct GTFS file"))
     }
 
-    fn last_updated(&self) -> DateTime<Utc> {
-        self.last_updated
+    fn coverage_start(&self) -> Option<DateTime<Utc>> {
+        let start_date = self.calendar.iter().map(|x| x.start_date.0).min()?;
+
+        Some(
+            start_date
+                .and_hms_opt(0, 0, 0)?
+                .and_local_timezone(Warsaw)
+                .single()?
+                .with_timezone(&Utc),
+        )
+    }
+
+    fn coverage_end(&self) -> Option<DateTime<Utc>> {
+        let end_date = self.calendar.iter().map(|x| x.end_date.0).max()?;
+
+        Some(
+            end_date
+                .and_hms_opt(23, 59, 59)?
+                .and_local_timezone(Warsaw)
+                .single()?
+                .with_timezone(&Utc),
+        )
     }
 }
 
