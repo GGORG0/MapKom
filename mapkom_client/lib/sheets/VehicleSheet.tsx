@@ -151,53 +151,63 @@ function VehicleDetailsSheetHeader({ vehicle }: { vehicle: VehicleLocation }) {
                     borderTopLeftRadius: 5 * theme.roundness,
                     borderTopRightRadius: 5 * theme.roundness,
                 },
-                localStyles.header,
+                localStyles.headerContainer,
             ]}>
-            <Chip
-                mode="flat"
-                avatar={
-                    <Icon
-                        source={
-                            (vehicle.line.vehicle_type?.toLowerCase() as
-                                | 'tram'
-                                | 'bus') || 'tram'
-                        }
-                        size={16}
-                        color="#FFFFFF"
+            <View style={localStyles.header}>
+                <Chip
+                    mode="flat"
+                    avatar={
+                        <Icon
+                            source={
+                                (vehicle.line.vehicle_type?.toLowerCase() as
+                                    | 'tram'
+                                    | 'bus') || 'tram'
+                            }
+                            size={16}
+                            color="#FFFFFF"
+                        />
+                    }
+                    style={{
+                        backgroundColor:
+                            customColors[vehicle.line.vehicle_type || 'TRAM'],
+                    }}
+                    textStyle={localStyles.whiteText}>
+                    {vehicle.line.number}
+                </Chip>
+                {!!vehicle.line.direction && (
+                    <Marquee
+                        style={localStyles.lineDirection}
+                        spacing={16}
+                        speed={0.5}>
+                        <Text numberOfLines={1} ellipsizeMode="tail">
+                            {vehicle.line.direction}
+                        </Text>
+                    </Marquee>
+                )}
+                {!!date && (
+                    // TODO: use a better library lol
+                    <TimeAgo
+                        formatter={formatDate(t)}
+                        date={date}
+                        render={({ value }: { value: string }) => (
+                            <Chip
+                                icon="bus-marker"
+                                mode="flat"
+                                style={localStyles.timerChip}>
+                                {value}
+                            </Chip>
+                        )}
                     />
-                }
-                style={{
-                    backgroundColor:
-                        customColors[vehicle.line.vehicle_type || 'TRAM'],
-                }}
-                textStyle={localStyles.whiteText}>
-                {vehicle.line.number}
-            </Chip>
-            {!!vehicle.line.direction && (
-                <Marquee
-                    style={localStyles.lineDirection}
-                    spacing={16}
-                    speed={0.5}>
-                    <Text numberOfLines={1} ellipsizeMode="tail">
-                        {vehicle.line.direction}
-                    </Text>
-                </Marquee>
-            )}
-            {!!date && (
-                // TODO: use a better library lol
-                <TimeAgo
-                    formatter={formatDate(t)}
-                    date={date}
-                    render={({ value }: { value: string }) => (
-                        <Chip
-                            icon="bus-marker"
-                            mode="flat"
-                            style={localStyles.timerChip}>
-                            {value}
-                        </Chip>
-                    )}
-                />
-            )}
+                )}
+            </View>
+            <View style={localStyles.header}>
+                <Text style={[localStyles.timerChip, localStyles.smallFont]}>
+                    {'#'}
+                    {vehicle.fleet_number}
+                    {!!vehicle.line.brigade && '/'}
+                    {vehicle.line.brigade}
+                </Text>
+            </View>
         </Surface>
     );
 }
@@ -292,11 +302,14 @@ const localStyles = StyleSheet.create({
         padding: 12,
         gap: 16,
     },
+    headerContainer: {
+        padding: 10,
+        gap: 8,
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        padding: 10,
         gap: 8,
     },
     whiteText: {
@@ -307,5 +320,8 @@ const localStyles = StyleSheet.create({
     },
     timerChip: {
         marginLeft: 'auto',
+    },
+    smallFont: {
+        fontSize: 12,
     },
 });
