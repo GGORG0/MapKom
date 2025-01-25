@@ -20,6 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+        working-directory: mapkom_client
 
       - name: Run Expo prebuild
         run: yarn expo prebuild
