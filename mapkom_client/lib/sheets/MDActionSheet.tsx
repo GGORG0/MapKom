@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import ActionSheet, {
     ActionSheetProps,
@@ -12,6 +13,7 @@ export default function MDActionSheet({
     style,
     children,
     addViewContainer = true,
+    gestureEnabled = true,
     ...props
 }: ActionSheetProps &
     React.RefAttributes<ActionSheetRef> & {
@@ -22,6 +24,8 @@ export default function MDActionSheet({
 
     return (
         <ActionSheet
+            gestureEnabled={gestureEnabled}
+            CustomHeaderComponent={<></>}
             containerStyle={{
                 borderTopLeftRadius: 5 * theme.roundness,
                 borderTopRightRadius: 5 * theme.roundness,
