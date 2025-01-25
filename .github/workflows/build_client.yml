@@ -1,0 +1,47 @@
+name: Build client APK
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+          cache-dependency-path: mapkom_client/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run Expo prebuild
+        run: yarn expo prebuild
+        working-directory: mapkom_client
+
+      - name: Change Gradle wrapper permissions
+        run: chmod +x ./gradlew
+        working-directory: mapkom_client/android
+
+      - name: Build Gradle project
+        run: ./gradlew assembleRelease
+        working-directory: mapkom_client/android
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: mapkom_client/android/app/build/outputs/apk/release/app-release.apk
