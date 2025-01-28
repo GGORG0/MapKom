@@ -52,7 +52,9 @@ fn connection_middleware(
     }
 }
 
-async fn handle_connection() {}
+async fn handle_connection() {
+    // TODO: send vehicle locations immediately on connection
+}
 
 pub fn init(city_map: CityMap) -> (SocketIoLayer, SocketIo) {
     let (layer, io) = SocketIoBuilder::new().with_state(city_map).build_layer();

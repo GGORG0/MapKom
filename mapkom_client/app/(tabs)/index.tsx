@@ -1,12 +1,10 @@
 import { styles } from '@/lib/styles';
 import { FAB, Surface } from 'react-native-paper';
-import * as MapLibreGL from '@maplibre/maplibre-react-native';
+import * as MapLibreNative from '@maplibre/maplibre-react-native';
 import { CameraRef } from '@maplibre/maplibre-react-native';
-import { Platform, StyleSheet, useColorScheme } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import lightStyle from '@/lib/mapStyles/light.json';
-import darkStyle from '@/lib/mapStyles/dark.json';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
@@ -18,72 +16,36 @@ import iconBusPointer from '@/assets/images/iconBusPointer.png';
 import iconBusSmall from '@/assets/images/iconBusSmall.png';
 import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
+import { useMapStyleString } from '@/lib/hooks/useMapStyle';
+import useLocationMarkers from '@/lib/hooks/useLocationMarkers';
+import { nativeMarkerIconStyles } from '@/lib/mapMarkerStyles';
+import getMapFilters from '@/lib/mapFilters';
 
-const mapStyles = {
-    light: lightStyle,
-    dark: darkStyle,
-};
-
-MapLibreGL.setAccessToken(null);
-if (!__DEV__) MapLibreGL.Logger.setLogLevel('error');
-else MapLibreGL.Logger.setLogLevel('warning');
+MapLibreNative.setAccessToken(null);
+if (!__DEV__) MapLibreNative.Logger.setLogLevel('error');
+else MapLibreNative.Logger.setLogLevel('warning');
 
 export default function Index() {
-    // INSETS //
     const insets = useSafeAreaInsets();
+    const mapStyleString = useMapStyleString();
 
-    // MAP STYLE //
-    const colorScheme = useColorScheme();
-
-    const mapStyle = colorScheme
-        ? mapStyles[colorScheme] || mapStyles.light
-        : mapStyles.light;
-
-    const mapStyleString = useMemo(() => JSON.stringify(mapStyle), [mapStyle]);
-
-    // LOCATION //
+    // TODO: handle approximate location
     const [locationPermissionStatus, requestPermission] =
         useForegroundPermissions();
-    // TODO: handle approximate location
-
     const [followUserLocation, setFollowUserLocation] = useState(false);
-
-    // MARKERS //
-    const [markers, setMarkers] = useState(featureCollection([]));
-
-    // TODO: move this to the backend (maybe)
-    const listener = useCallback((_: string, vehicles: VehicleLocation[]) => {
-        const features = vehicles.map((vehicle) =>
-            feature(
-                {
-                    type: 'Point',
-                    coordinates: [vehicle.position.lng, vehicle.position.lat],
-                },
-                {
-                    id: `${vehicle.line.vehicle_type}-${vehicle.fleet_number}`,
-                    vehicle,
-                    line: vehicle.line.number,
-                    vehicleType: vehicle.line.vehicle_type,
-                    heading: vehicle.heading,
-                },
-            ),
-        );
-
-        setMarkers(featureCollection(features));
-    }, []);
-
-    useSocketIoListener('vehicle_locations', listener);
 
     const cameraRef = useRef<CameraRef>(null);
 
+    const markers = useLocationMarkers();
     const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
+    const mapFilters = useMemo(
+        () => getMapFilters(selectedMarker),
+        [selectedMarker],
+    );
 
     return (
         <Surface style={styles.screen}>
-            {/* <Surface elevation={1} style={localStyles.debugView}>
-            </Surface> */}
-
-            <MapLibreGL.MapView
+            <MapLibreNative.MapView
                 style={localStyles.map}
                 mapStyle={mapStyleString}
                 localizeLabels={false}
@@ -93,7 +55,7 @@ export default function Index() {
                     y: Platform.OS === 'ios' ? 0 : Math.max(insets.top, 8),
                     x: insets.right + 8,
                 }}>
-                <MapLibreGL.Camera
+                <MapLibreNative.Camera
                     ref={cameraRef}
                     animationMode="flyTo"
                     followUserLocation={
@@ -107,7 +69,7 @@ export default function Index() {
                 />
                 {locationPermissionStatus?.granted && (
                     <>
-                        <MapLibreGL.UserLocation
+                        <MapLibreNative.UserLocation
                             animated
                             showsUserHeadingIndicator
                             androidRenderMode="compass"
@@ -116,7 +78,7 @@ export default function Index() {
                     </>
                 )}
 
-                <MapLibreGL.Images
+                <MapLibreNative.Images
                     images={{
                         iconTramPointer: iconTramPointer,
                         iconTramSmall: iconTramSmall,
@@ -126,8 +88,9 @@ export default function Index() {
                 />
 
                 {/* TODO: animate the markers */}
-                <MapLibreGL.ShapeSource
+                <MapLibreNative.ShapeSource
                     id="markerSource"
+                    key="markerSource"
                     onPress={({ features }) => {
                         SheetManager.show('vehicle-sheet', {
                             payload: {
@@ -135,106 +98,67 @@ export default function Index() {
                                     (feature) => feature.properties?.vehicle,
                                 ),
                                 setSelectedMarker,
-                                cameraRef,
+                                setPos: (pos: [number, number]) => {
+                                    cameraRef.current?.flyTo(pos, 1000);
+
+                                    const timeout = setTimeout(() => {
+                                        cameraRef.current?.zoomTo(16, 200);
+                                    }, 1050);
+
+                                    return () => {
+                                        clearTimeout(timeout);
+                                    };
+                                },
                             },
                         });
                     }}
                     hitbox={{ width: 50, height: 50 }}
-                    shape={markers}>
+                    shape={markers}
+                    cluster={false}>
                     {/* TRAMS */}
-                    <MapLibreGL.SymbolLayer
+                    {/* TODO: big tram markers aren't filtered correctly */}
+                    <MapLibreNative.SymbolLayer
                         id="tramMarkers"
+                        key="tramMarkers"
                         minZoomLevel={13}
-                        style={{
-                            ...markerStyles.marker,
-                            ...markerStyles.bigMarker,
-                            iconImage: 'iconTramPointer',
-                        }}
-                        filter={
-                            selectedMarker
-                                ? [
-                                      'all',
-                                      [
-                                          '==',
-                                          ['literal', 'TRAM'],
-                                          ['get', 'vehicleType'],
-                                      ],
-                                      [
-                                          '==',
-                                          ['literal', selectedMarker],
-                                          ['get', 'id'],
-                                      ],
-                                  ]
-                                : [
-                                      '==',
-                                      ['literal', 'TRAM'],
-                                      ['get', 'vehicleType'],
-                                  ]
-                        }
+                        style={nativeMarkerIconStyles.bigMarker(
+                            'iconTramPointer',
+                        )}
+                        filter={mapFilters.TRAM}
                     />
-                    <MapLibreGL.SymbolLayer
+                    <MapLibreNative.SymbolLayer
                         id="tramMarkersSmall"
+                        key="tramMarkersSmall"
                         minZoomLevel={9}
                         maxZoomLevel={13}
-                        style={{
-                            ...markerStyles.marker,
-                            ...markerStyles.smallMarker,
-                            iconImage: 'iconTramSmall',
-                        }}
-                        filter={[
-                            '==',
-                            ['literal', 'TRAM'],
-                            ['get', 'vehicleType'],
-                        ]}
+                        style={nativeMarkerIconStyles.smallMarker(
+                            'iconTramSmall',
+                        )}
+                        filter={mapFilters.TRAM}
                     />
+
                     {/* BUSES */}
-                    <MapLibreGL.SymbolLayer
+                    <MapLibreNative.SymbolLayer
                         id="busMarkers"
+                        key="busMarkers"
                         minZoomLevel={13}
-                        style={{
-                            ...markerStyles.marker,
-                            ...markerStyles.bigMarker,
-                            iconImage: 'iconBusPointer',
-                        }}
-                        filter={
-                            selectedMarker
-                                ? [
-                                      'all',
-                                      [
-                                          '==',
-                                          ['literal', 'BUS'],
-                                          ['get', 'vehicleType'],
-                                      ],
-                                      [
-                                          'in',
-                                          ['literal', selectedMarker],
-                                          ['get', 'id'],
-                                      ],
-                                  ]
-                                : [
-                                      '==',
-                                      ['literal', 'BUS'],
-                                      ['get', 'vehicleType'],
-                                  ]
-                        }
+                        style={nativeMarkerIconStyles.bigMarker(
+                            'iconBusPointer',
+                        )}
+                        filter={mapFilters.BUS}
                     />
-                    <MapLibreGL.SymbolLayer
+                    <MapLibreNative.SymbolLayer
                         id="busMarkersSmall"
+                        key="busMarkersSmall"
                         minZoomLevel={9}
                         maxZoomLevel={13}
-                        style={{
-                            ...markerStyles.marker,
-                            ...markerStyles.smallMarker,
-                            iconImage: 'iconBusSmall',
-                        }}
-                        filter={[
-                            '==',
-                            ['literal', 'BUS'],
-                            ['get', 'vehicleType'],
-                        ]}
+                        style={nativeMarkerIconStyles.smallMarker(
+                            'iconBusSmall',
+                        )}
+                        filter={mapFilters.BUS}
                     />
-                </MapLibreGL.ShapeSource>
-            </MapLibreGL.MapView>
+                </MapLibreNative.ShapeSource>
+            </MapLibreNative.MapView>
 
             <MapFabStack>
                 <FAB
@@ -262,43 +186,4 @@ const localStyles = StyleSheet.create({
         flex: 1,
         alignSelf: 'stretch',
     },
-    // debugView: {
-    //   position: 'absolute',
-    //   top: 0,
-    //   left: 0,
-    //   right: 0,
-    //   textAlign: 'center',
-    //   alignItems: 'center',
-    //   justifyContent: 'center',
-    //   margin: 8,
-    //   marginTop: 50,
-    //   padding: 8,
-    //   zIndex: 100,
-    // },
 });
-
-const markerStyles: Record<string, MapLibreGL.SymbolLayerStyle> = {
-    marker: {
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-
-        iconPitchAlignment: 'map',
-        iconRotationAlignment: 'map',
-    },
-    bigMarker: {
-        iconSize: 0.15,
-        iconRotate: ['get', 'heading'],
-
-        textField: ['get', 'line'],
-        textFont: ['Noto Sans Regular'],
-        textColor: '#fff',
-        textSize: 14,
-
-        // TODO: fix text overlap (while also not hiding overlapping markers)
-        textAllowOverlap: true,
-        textIgnorePlacement: true,
-    },
-    smallMarker: {
-        iconSize: 0.04,
-    },
-};

@@ -23,6 +23,8 @@ pub async fn send_vehicle_locations(
 
     let vehicles = vehicles.iter().collect::<Vec<_>>();
 
+    // TODO: re-add viewport tracking and filtering
+
     s.emit("vehicle_locations", &(last_updated, vehicles))
         .expect("Failed to send vehicle list to socket");
 }

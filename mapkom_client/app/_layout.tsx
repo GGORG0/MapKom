@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { useMaterial3Theme } from '@pchmn/expo-material3-theme';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import {
     adaptNavigationTheme,
     MD3DarkTheme,
@@ -31,6 +31,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { BackendUrlProvider } from '@/lib/providers/BackendUrlProvider';
 import { SnackbarToastProvider } from '@/lib/providers/SnackbarToastProvider';
+import WebLanguageDetector from 'i18next-browser-languagedetector';
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -38,17 +39,23 @@ SplashScreen.setOptions({
     fade: true,
 });
 
-const languageDetector = createLanguageDetector({});
+let i18nInst = i18n;
 
-i18n.use(languageDetector)
-    .use(initReactI18next)
-    .init({
-        resources,
-        fallbackLng: 'en',
-        interpolation: {
-            escapeValue: false,
-        },
-    });
+if (Platform.OS === 'android' || Platform.OS === 'ios') {
+    const languageDetector = createLanguageDetector({});
+    i18nInst = i18n.use(languageDetector);
+} else if (Platform.OS === 'web') {
+    i18nInst = i18n.use(WebLanguageDetector);
+}
+
+i18nInst.use(initReactI18next).init({
+    supportedLngs: ['en', 'en-US', 'en-GB', 'pl', 'pl-PL'],
+    resources,
+    fallbackLng: 'en',
+    interpolation: {
+        escapeValue: false,
+    },
+});
 
 export default function RootLayoutWrapper() {
     const [loaded, error] = useFonts({

@@ -31,7 +31,7 @@ import React, {
 import { VehicleLocation } from '../vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
 import { StyleSheet, View } from 'react-native';
-import { CameraRef } from '@maplibre/maplibre-react-native';
+// import { CameraRef } from '@maplibre/maplibre-react-native';
 import { customColors } from '../styles';
 import { useTranslation } from 'react-i18next';
 import { TFunctionNonStrict } from 'i18next';
@@ -76,6 +76,8 @@ function VehicleChooserSheetRoute() {
 function VehicleDetailsSheetRoute() {
     const { t } = useTranslation();
 
+    const [prevPos, setPrevPos] = useState<[number, number] | null>(null);
+
     const params = useSheetRouteParams('vehicle-sheet', 'details');
     const parentParams = useSheetPayload('vehicle-sheet');
 
@@ -90,21 +92,23 @@ function VehicleDetailsSheetRoute() {
                 : null,
         );
 
-        let timeout: NodeJS.Timeout | null = null;
+        let destroy: (() => void) | null = null;
 
-        if (vehicle) {
-            parentParams.cameraRef.current?.flyTo(
-                [vehicle.position.lng, vehicle.position.lat],
-                1000,
-            );
-            timeout = setTimeout(() => {
-                parentParams.cameraRef.current?.zoomTo(16, 200);
-            }, 1050);
+        if (
+            vehicle &&
+            (prevPos?.[0] !== vehicle.position.lng ||
+                prevPos?.[1] !== vehicle.position.lat)
+        ) {
+            setPrevPos([vehicle.position.lng, vehicle.position.lat]);
+            destroy = parentParams.setPos([
+                vehicle.position.lng,
+                vehicle.position.lat,
+            ]);
         }
 
         return () => {
-            if (timeout) {
-                clearTimeout(timeout);
+            if (destroy) {
+                destroy();
             }
         };
     }, [parentParams, vehicle]);
@@ -259,7 +263,7 @@ export type definition = SheetDefinition<{
     payload: {
         vehicles: VehicleLocation[];
         setSelectedMarker: Dispatch<SetStateAction<string | null>>;
-        cameraRef: RefObject<CameraRef>;
+        setPos: (pos: [number, number]) => () => void;
     };
 }>;
 
@@ -305,6 +309,7 @@ const localStyles = StyleSheet.create({
     headerContainer: {
         padding: 10,
         gap: 8,
+        width: '100%',
     },
     header: {
         flexDirection: 'row',

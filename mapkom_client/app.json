@@ -8,6 +8,11 @@
         "scheme": "mapkom",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": false,
+        "platforms": [
+            "android",
+            "ios",
+            "web"
+        ],
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "xyz.ggorg.mapkom"
@@ -21,6 +26,7 @@
             "package": "xyz.ggorg.mapkom"
         },
         "web": {
+            "name": "MapKom",
             "bundler": "metro",
             "output": "static",
             "favicon": "./assets/logos/logo-circle.png"

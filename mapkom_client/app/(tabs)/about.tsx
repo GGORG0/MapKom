@@ -10,6 +10,7 @@ import {
     showUrlChangeSheet,
     useBackendUrl,
 } from '@/lib/providers/BackendUrlProvider';
+import { Platform } from 'react-native';
 
 export default function AboutScreen() {
     const { t } = useTranslation();
@@ -45,10 +46,13 @@ export default function AboutScreen() {
                 onPress={() => {
                     setDevTapCount((prev) => prev + 1);
                 }}>
-                {Application.nativeApplicationVersion}
-                {' ('}
-                {t('aboutPage.build')} {Application.nativeBuildVersion}
-                {')'}
+                {Platform.OS} {Application.nativeApplicationVersion}
+                {!!Application.nativeBuildVersion &&
+                    ' (' +
+                        t('aboutPage.build') +
+                        ' ' +
+                        Application.nativeBuildVersion +
+                        ')'}
             </Text>
 
             <Link href="https://github.com/GGORG0/MapKom" asChild>
