@@ -18,6 +18,13 @@
     Public transport on a map
     <br />
     <br />
+    <b>
+    <a href="https://nightly.link/GGORG0/MapKom/workflows/build_client/master/release">Download for Android</a>
+    &middot;
+    <a href="https://mapkom.ggorg.xyz">Visit web version</a>
+    </b>
+    <br />
+    <br />
     <a href="https://github.com/GGORG0/MapKom/issues/new?labels=bug&template=bug-report.md&title=%5BBUG%5D%3A+">Report Bug</a>
     &middot;
     <a href="https://github.com/GGORG0/MapKom/issues/new?labels=city+bug&template=city-bug.md&title=%5BCB%5D%3A+">Report City Bug</a>
@@ -39,7 +46,7 @@ This is an ~~all-in-one~~ (soon™) app for ~~all~~ your public transport needs 
 There is still a lot to do, but once it is all finished, I guarantee you'll love this app!
 Stay tuned for updates!
 
-- 📱 Runs natively on **Android, ~~iOS~~ (currently broken) and ~~the web~~ (currently broken)**
+- 📱 Runs natively on **[Android](https://nightly.link/GGORG0/MapKom/workflows/build_client/master/release), ~~iOS~~ (currently broken) and [the web](https://mapkom.ggorg.xyz)**
 - 👀 Beautiful **Material Design 3** and Material You look
 - 🗺️ Smooth and snappy **vector map** (no black squares while scrolling around!)
 - 🦀 Blazingly **fast backend**, written in Rust
@@ -94,6 +101,8 @@ If you use VSCode, you can open the `mapkom.code-workspace` workspace for ease o
 
 **Note**: This project **will not** run in Expo Go. You will have to use a development build.
 
+**Note**: This project's web version **will not** build in development mode, failing with `Object prototype may only be an Object or null: undefined`. You need to pass the `--no-dev` flag to Expo to build it correctly. This is because MapLibre-React-Native would still be built in dev mode (because of bundler optimizations being disabled), and fail loading the native modules.
+
 0. Install the prerequisites:
    - Both
      - [Node.js](https://nodejs.org/)
@@ -125,11 +134,28 @@ If you use VSCode, you can open the `mapkom.code-workspace` workspace for ease o
 
    # For iOS
    yarn expo run:ios
+
+   # For Web, see note above
+   yarn expo start --web --no-dev
    ```
 
 5. You can also run the Metro bundler (development server) by itself if you don't want to recompile/reinstall the app
    ```sh
    yarn expo start -d
+   ```
+6. Build a production-optimized release
+
+   ```sh
+   # For Android
+   cd android
+   ./gradlew assembleRelease
+   adb install app/build/outputs/apk/release/app-release.apk
+
+   # For iOS - idk, figure it out :)
+
+   # For Web
+   yarn expo export -p web
+   yarn expo serve # or just serve the files in dist/ manually, it's all statically bundled
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
