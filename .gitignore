@@ -3,3 +3,4 @@ cache
 .direnv
 flake.lock
 *.nix
+.envrc
