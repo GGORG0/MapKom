@@ -1,0 +1,31 @@
+name: Expo Doctor
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  expo-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "yarn"
+          cache-dependency-path: mapkom_client/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: mapkom_client
+
+      - name: Run Expo Doctor
+        env:
+          CI: "1"
+        run: yarn expo-doctor
+        working-directory: mapkom_client
