@@ -1,13 +1,14 @@
 pub mod send_vehicle_locations;
 
 use crate::cities::CityMap;
-use color_eyre::{Result, eyre::eyre};
+use color_eyre::{eyre::eyre, Result};
+use send_vehicle_locations::send_vehicle_locations;
 use serde::Deserialize;
 use socketioxide::{
-    SocketIo, SocketIoBuilder,
-    extract::{Data, SocketRef, State},
+    extract::{Data, Extension, SocketRef, State},
     handler::ConnectHandler,
     layer::SocketIoLayer,
+    SocketIo, SocketIoBuilder,
 };
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -52,8 +53,12 @@ fn connection_middleware(
     }
 }
 
-async fn handle_connection() {
-    // TODO: send vehicle locations immediately on connection
+async fn handle_connection(
+    s: SocketRef,
+    Extension(state): Extension<SocketStateWrapped>,
+    State(city_map): State<CityMap>,
+) {
+    send_vehicle_locations(s, Extension(state), State(city_map)).await;
 }
 
 pub fn init(city_map: CityMap) -> (SocketIoLayer, SocketIo) {
