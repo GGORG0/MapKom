@@ -2,9 +2,11 @@ name: Build client
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: ["master"]
+    paths: ["mapkom_client/**"]
+  pull_request:
+    branches: ["master"]
+    paths: ["mapkom_client/**"]
 
 jobs:
   build-android:
@@ -74,6 +76,8 @@ jobs:
 
   deploy-web:
     needs: build-web
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     permissions:
       pages: write

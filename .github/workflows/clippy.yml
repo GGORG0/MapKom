@@ -3,8 +3,14 @@ name: Clippy
 on:
   push:
     branches: ["master"]
+    paths:
+      - "mapkom_server/**"
+      - "Cargo.*"
   pull_request:
     branches: ["master"]
+    paths:
+      - "mapkom_server/**"
+      - "Cargo.*"
 
 jobs:
   clippy:

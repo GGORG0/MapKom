@@ -3,8 +3,10 @@ name: Expo Doctor
 on:
   push:
     branches: ["master"]
+    paths: ["mapkom_client/**"]
   pull_request:
     branches: ["master"]
+    paths: ["mapkom_client/**"]
 
 jobs:
   expo-doctor:
