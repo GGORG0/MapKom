@@ -1,4 +1,4 @@
-name: Build client APK
+name: Build client
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'yarn'
+          cache: "yarn"
           cache-dependency-path: mapkom_client/yarn.lock
 
       - name: Install dependencies
@@ -29,9 +29,9 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: 'gradle'
+          distribution: "zulu"
+          java-version: "17"
+          cache: "gradle"
 
       - name: Change Gradle wrapper permissions
         run: chmod +x ./gradlew
@@ -44,5 +44,46 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: android-release
           path: mapkom_client/android/app/build/outputs/apk/release/app-release.apk
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "yarn"
+          cache-dependency-path: mapkom_client/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: mapkom_client
+
+      - name: Run Expo export
+        run: yarn expo export -p web
+        working-directory: mapkom_client
+
+      - name: Upload built static files as an artifact
+        id: web-release
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build_outputs_folder/
+
+  deploy-web:
+    needs: build-web
+
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy web client to GitHub Pages
+        id: web-release
+        uses: actions/deploy-pages@v4
