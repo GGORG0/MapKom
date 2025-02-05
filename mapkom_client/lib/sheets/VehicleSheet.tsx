@@ -21,7 +21,6 @@ import {
 } from 'react-native-actions-sheet';
 import React, {
     Dispatch,
-    RefObject,
     SetStateAction,
     useCallback,
     useEffect,
@@ -111,7 +110,7 @@ function VehicleDetailsSheetRoute() {
                 destroy();
             }
         };
-    }, [parentParams, vehicle]);
+    }, [parentParams, prevPos, vehicle]);
 
     const listener = useCallback(
         (_: string, vehicles: VehicleLocation[]) => {

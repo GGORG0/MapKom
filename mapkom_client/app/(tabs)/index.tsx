@@ -4,17 +4,14 @@ import * as MapLibreNative from '@maplibre/maplibre-react-native';
 import { CameraRef } from '@maplibre/maplibre-react-native';
 import { Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useForegroundPermissions } from 'expo-location';
 import MapFabStack from '@/lib/components/MapFabStack';
 import React from 'react';
-import { useSocketIoListener } from '@/lib/providers/SocketIoProvider';
-import { feature, featureCollection } from '@turf/helpers';
 import iconTramPointer from '@/assets/images/iconTramPointer.png';
 import iconTramSmall from '@/assets/images/iconTramSmall.png';
 import iconBusPointer from '@/assets/images/iconBusPointer.png';
 import iconBusSmall from '@/assets/images/iconBusSmall.png';
-import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
 import { useMapStyleString } from '@/lib/hooks/useMapStyle';
 import useLocationMarkers from '@/lib/hooks/useLocationMarkers';
@@ -39,7 +36,7 @@ export default function Index() {
     const markers = useLocationMarkers();
     const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
     const mapFilters = useMemo(
-        () => getMapFilters(selectedMarker),
+        () => getMapFilters<'native'>(selectedMarker),
         [selectedMarker],
     );
 

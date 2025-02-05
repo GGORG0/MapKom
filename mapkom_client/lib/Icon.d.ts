@@ -2,7 +2,7 @@ import GlyphMap from '@expo/vector-icons/build/vendor/react-native-vector-icons/
 import { ImageSourcePropType, View } from 'react-native';
 import type { Props as OriginalIconProps } from 'react-native-paper/src/components/Icon';
 import type { Props as OriginalButtonProps } from 'react-native-paper/src/components/Button/Button';
-import { ForwardedRef } from 'react';
+import type { ForwardRefComponent } from 'react-native-paper/src/utils/forwardRef';
 
 export type MaterialCommunityIcon = keyof typeof GlyphMap;
 export default MaterialCommunityIcon;
@@ -41,10 +41,12 @@ declare module 'react-native-paper/src/components/Icon' {
 declare module 'react-native-paper/src/components/Button' {
     export type Props = ReplaceProps<OriginalButtonProps, 'icon'>;
 
-    export default function Button(
-        props: ReplaceProps<OriginalButtonProps, 'icon'>,
-        ref: ForwardedRef<View>,
-    ): React.ReactNode;
+    export type Button = ForwardRefComponent<
+        View,
+        ReplaceProps<OriginalButtonProps, 'icon'>
+    >;
+
+    export default Button;
 }
 
 declare module 'react-native-paper' {
@@ -54,8 +56,8 @@ declare module 'react-native-paper' {
     export function Icon(
         props: ReplaceProps<OriginalIconProps, 'source'>,
     ): React.ReactNode;
-    export function Button(
-        props: ReplaceProps<OriginalButtonProps, 'icon'>,
-        ref: ForwardedRef<View>,
-    ): React.ReactNode;
+    export type Button = ForwardRefComponent<
+        View,
+        ReplaceProps<OriginalButtonProps, 'icon'>
+    >;
 }

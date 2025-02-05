@@ -1,18 +1,13 @@
 import { styles } from '@/lib/styles';
-import { FAB, Surface } from 'react-native-paper';
+import { Surface } from 'react-native-paper';
 import * as MapLibreWeb from '@vis.gl/react-maplibre';
-import { ImageSourcePropType, ImageURISource, StyleSheet } from 'react-native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForegroundPermissions } from 'expo-location';
-import MapFabStack from '@/lib/components/MapFabStack';
+import { ImageURISource, StyleSheet } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
 import React from 'react';
-import { useSocketIoListener } from '@/lib/providers/SocketIoProvider';
-import { feature, featureCollection } from '@turf/helpers';
 import iconTramPointer from '@/assets/images/iconTramPointer.png';
 import iconTramSmall from '@/assets/images/iconTramSmall.png';
 import iconBusPointer from '@/assets/images/iconBusPointer.png';
 import iconBusSmall from '@/assets/images/iconBusSmall.png';
-import { VehicleLocation } from '@/lib/vehicle';
 import { SheetManager } from 'react-native-actions-sheet';
 import useMapStyle from '@/lib/hooks/useMapStyle';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -26,7 +21,7 @@ export default function IndexWeb() {
     const markers = useLocationMarkers();
     const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
     const mapFilters = useMemo(
-        () => getMapFilters(selectedMarker),
+        () => getMapFilters<'web'>(selectedMarker),
         [selectedMarker],
     );
 
@@ -37,7 +32,7 @@ export default function IndexWeb() {
     return (
         <Surface style={styles.screen}>
             <MapLibreWeb.Map
-                mapStyle={mapStyle as MapLibreWeb.MapStyle}
+                mapStyle={mapStyle as MapLibreWeb.StyleSpecification}
                 style={localStyles.map}
                 maxPitch={0}
                 attributionControl={false}>
@@ -175,7 +170,7 @@ function ClickHandler({ setSelectedMarker }: ClickHandlerProps) {
                 });
             });
         });
-    }, [map]);
+    }, [map, setSelectedMarker]);
 
     return null;
 }

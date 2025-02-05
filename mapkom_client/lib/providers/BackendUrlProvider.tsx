@@ -33,11 +33,13 @@ export function BackendUrlProvider({ children }: BackendUrlProviderProps) {
                       const scriptURL = NativeModules?.SourceCode?.scriptURL;
                       if (!scriptURL) return process.env.EXPO_PUBLIC_API_URL;
                       const url = new URL(scriptURL);
-                      if (url.hostname.endsWith("exp.direct")) return process.env.EXPO_PUBLIC_API_URL;
+                      if (url.hostname.endsWith('exp.direct'))
+                          return process.env.EXPO_PUBLIC_API_URL;
                       return `${url.protocol}//${url.hostname}:8080`;
                   }) as () => string
               )()
-            : process.env.EXPO_PUBLIC_API_URL) || 'https://mapkom-api.ggorg.xyz',
+            : process.env.EXPO_PUBLIC_API_URL) ||
+            'https://mapkom-api.ggorg.xyz',
     );
 
     // TODO: handle more than 1 city + remember the last city + detect city by location + add city selection menu

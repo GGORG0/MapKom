@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
 import type { FilterExpression as NativeExpression } from '@maplibre/maplibre-react-native/src/types/MapLibreRNStyles';
 import type { ExpressionSpecification as WebExpression } from 'maplibre-gl';
-import type { Platform, PlatformWebStatic } from 'react-native';
 
-type MapFilter = Platform extends PlatformWebStatic
+type Platform = 'web' | 'native';
+
+type MapFilter<P extends Platform> = P extends 'web'
     ? WebExpression
     : NativeExpression;
 
-type MapFilters = {
-    BUS: MapFilter;
-    TRAM: MapFilter;
+type MapFilters<P extends Platform> = {
+    BUS: MapFilter<P>;
+    TRAM: MapFilter<P>;
 };
 
 type VehicleTypeFilter = ['==', ['literal', string], ['get', 'vehicleType']];
@@ -30,9 +30,9 @@ function combineFilters(
     return ['all', typeFilter, selectedFilter];
 }
 
-export default function getMapFilters(
+export default function getMapFilters<P extends Platform>(
     selectedMarker: string | null,
-): MapFilters {
+): MapFilters<P> {
     if (selectedMarker) {
         return {
             BUS: combineFilters(
