@@ -70,7 +70,7 @@ jobs:
         id: web-release
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build_outputs_folder/
+          path: mapkom_client/dist/
 
   deploy-web:
     needs: build-web
