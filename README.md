@@ -46,7 +46,7 @@ This is an ~~all-in-one~~ (soon™) app for ~~all~~ your public transport needs 
 There is still a lot to do, but once it is all finished, I guarantee you'll love this app!
 Stay tuned for updates!
 
-- 📱 Runs natively on **[Android](https://nightly.link/GGORG0/MapKom/workflows/build_client/master/android-release.zip), ~~iOS~~ (currently broken) and [the web](https://mapkom.ggorg.xyz)**
+- 📱 Runs natively on **[Android](https://nightly.link/GGORG0/MapKom/workflows/build_client/master/android-release.zip), iOS (but you have to build it yourself) and [the web](https://mapkom.ggorg.xyz)**
 - 👀 Beautiful **Material Design 3** and Material You look
 - 🗺️ Smooth and snappy **vector map** (no black squares while scrolling around!)
 - 🦀 Blazingly **fast backend**, written in Rust
