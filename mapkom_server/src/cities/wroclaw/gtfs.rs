@@ -103,7 +103,7 @@ impl GtfsArchive<Wroclaw> for WroclawGtfs {
 
     #[instrument(name = "wroclaw_gtfs_download")]
     async fn download() -> Result<ZipArchive<Cursor<Bytes>>> {
-        const HISTORY_URL: &str = "https://www.wroclaw.pl/open-data/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/7d10d77f-bcf3-47b2-a608-613971c4f5f8";
+        const HISTORY_URL: &str = "https://www.wroclaw.pl/open-data/dataset/rozkladjazdytransportupublicznegoplik_data/resource_history/19336647-127b-4b74-abb8-202bfeea670b";
 
         let urls = {
             let response = HTTP_CLIENT.get(HISTORY_URL).send().await?.text().await?;

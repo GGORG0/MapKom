@@ -1,18 +1,18 @@
 use crate::{
-    HTTP_CLIENT,
-    cities::{City, Line, LocationSource, VehicleLocation, wroclaw::Wroclaw},
+    cities::{wroclaw::Wroclaw, City, Line, LocationSource, VehicleLocation},
     geometry::point::Point,
+    HTTP_CLIENT,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use chrono_tz::Europe::Warsaw;
-use color_eyre::{Result, eyre::ContextCompat as _};
+use color_eyre::{eyre::ContextCompat as _, Result};
 use serde::Deserialize;
 use tracing::instrument;
 
 // Open API available at https://www.wroclaw.pl/open-data/dataset/lokalizacjapojazdowkomunikacjimiejskiejnatrasie_data
 
 const API_URL: &str =
-    "https://www.wroclaw.pl/open-data/datastore/dump/17308285-3977-42f7-81b7-fdd168c210a2";
+    "https://www.wroclaw.pl/open-data/datastore/dump/a9b3841d-e977-474e-9e86-8789e470a85a";
 
 #[derive(Deserialize, Debug)]
 struct OpenDataResponse {
